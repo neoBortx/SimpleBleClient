@@ -89,8 +89,5 @@ internal class BleNetworkMessageProcessor {
 
     fun isReceived() = bytesRemaining == 0
 
-    fun getPacket() = BleNetworkMessage(id(), status(), packet, !isReceived())
-
-    private fun id() = packet[0].toInt()
-    private fun status() = packet[1].toInt()
+    fun getPacket() = BleNetworkMessage(packet, !isReceived())
 }

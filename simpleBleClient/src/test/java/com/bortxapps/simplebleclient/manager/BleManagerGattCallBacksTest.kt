@@ -24,7 +24,7 @@ import java.util.concurrent.CancellationException
 import kotlin.concurrent.thread
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class BleManagerGattCallBacksTest {
+internal class BleManagerGattCallBacksTest {
 
     private val bleNetworkMessageProcessor = mockk<BleNetworkMessageProcessor>()
     private val bluetoothGattMock = mockk<BluetoothGatt>()
@@ -32,7 +32,7 @@ class BleManagerGattCallBacksTest {
 
     private lateinit var bleManagerGattCallBacks: BleManagerGattCallBacks
     private val value = byteArrayOf(0x01, 0x02, 0x03)
-    private val receivedMessage = BleNetworkMessage(0, 0, value.toUByteArray())
+    private val receivedMessage = BleNetworkMessage(value.toUByteArray())
 
     @Before
     fun setUp() {
