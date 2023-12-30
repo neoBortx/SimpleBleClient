@@ -1,7 +1,6 @@
 package com.bortxapps.simplebleclient.api
 
 import android.content.Context
-
 import com.bortxapps.simplebleclient.di.BleLibraryContainer
 import com.bortxapps.simplebleclient.manager.BleManager
 import com.bortxapps.simplebleclient.manager.contracts.SimpleBleClient

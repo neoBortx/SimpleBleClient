@@ -27,7 +27,6 @@ internal class BleManagerGattCallBacks(private val bleNetworkMessageProcessor: B
 
     private var readComplexResponse: Boolean = false
 
-
     override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
         if (status == BluetoothGatt.GATT_SUCCESS) {
             when (newState) {
@@ -169,6 +168,4 @@ internal class BleManagerGattCallBacks(private val bleNetworkMessageProcessor: B
         ?: throw UninitializedPropertyAccessException("onServicesDiscoveredDeferred is null, you must call initDiscoverServicesOperation() first")
 
     //endregion
-
-
 }

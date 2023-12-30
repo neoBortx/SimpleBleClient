@@ -27,7 +27,6 @@ internal class BleManagerGattSubscriptions(
         private const val BLE_DESCRIPTION_BASE_UUID = "00002902-0000-1000-8000-00805F9B34FB"
     }
 
-
     suspend fun subscribeToNotifications(bluetoothGatt: BluetoothGatt, characteristicsUUid: List<UUID>) {
         getNotifiableCharacteristics(bluetoothGatt, characteristicsUUid).forEach { characteristic ->
             withContext(IO) {
@@ -40,12 +39,10 @@ internal class BleManagerGattSubscriptions(
                     } else {
                         throw SimpleBleClientException(BleError.UNABLE_TO_SUBSCRIBE_TO_NOTIFICATIONS)
                     }
-
                 }
             }
         }
     }
-
 
     private fun getNotifiableCharacteristics(bluetoothGatt: BluetoothGatt, characteristicsUUid: List<UUID>): List<BluetoothGattCharacteristic> =
         bluetoothGatt.services

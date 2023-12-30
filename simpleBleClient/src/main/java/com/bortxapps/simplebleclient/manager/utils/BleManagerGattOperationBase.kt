@@ -15,9 +15,7 @@ internal abstract class BleManagerGattOperationBase(
     private val bleConfiguration: BleConfiguration
 ) {
 
-
     protected suspend fun <T> launchGattOperation(operation: suspend () -> T): T {
-
         val error: BleError = try {
             return withTimeout(bleConfiguration.operationTimeoutMillis) {
                 gattMutex.withLock {
@@ -38,7 +36,6 @@ internal abstract class BleManagerGattOperationBase(
     }
 
     protected suspend fun <T> launchDeferredOperation(operation: suspend () -> T): T {
-
         val error: BleError = try {
             return operation()
         } catch (e: CancellationException) {

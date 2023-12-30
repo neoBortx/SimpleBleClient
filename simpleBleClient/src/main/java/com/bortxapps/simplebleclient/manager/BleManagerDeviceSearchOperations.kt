@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.onEach
 import java.util.UUID
 
 internal class BleManagerDeviceSearchOperations(
-    private val bleScanner: BleDeviceScannerManager,
-)  {
+    private val bleScanner: BleDeviceScannerManager
+) {
 
     private var searchingDevices = false
     private val detectedDevices = mutableListOf<BluetoothDevice>()
@@ -41,7 +41,6 @@ internal class BleManagerDeviceSearchOperations(
             ?.bondedDevices
             ?.filter { it.name.startsWith(deviceNamePrefix) }
             .orEmpty()
-
 
     fun getDetectedDevices() = detectedDevices.toList()
 

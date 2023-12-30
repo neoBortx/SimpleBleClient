@@ -100,8 +100,6 @@ class BleManagerGattWriteOperationsTest {
     //region sendData
     @Test
     fun testSendData_GattNotInitialized_expectException() = runTest {
-        
-
         Assert.assertThrows(SimpleBleClientException::class.java) {
             runBlocking {
                 bleManagerGattWriteOperations.sendData(serviceUUID, characteristicUUID, ByteArray(1), bluetoothGattMock, false)
@@ -113,7 +111,7 @@ class BleManagerGattWriteOperationsTest {
     @Test
     fun testSendData_simpleData_sendSuccess_oldAPI_expectTrue() = runTest {
         val value = ByteArray(1)
-        
+
         every { bluetoothGattMock.writeCharacteristic(bluetoothCharacteristicMock) } answers {
             callbackSlot.captured.onCharacteristicRead(bluetoothGattMock, bluetoothCharacteristicMock, value, BluetoothGatt.GATT_SUCCESS)
             true
@@ -146,7 +144,7 @@ class BleManagerGattWriteOperationsTest {
     @Test
     fun testSendData_simpleData_sendSuccess_newAPI_expectTrue() = runTest {
         val value = ByteArray(1)
-        
+
         every { buildVersionProviderMock.getSdkVersion() } returns Build.VERSION_CODES.TIRAMISU
         every {
             bluetoothGattMock.writeCharacteristic(
@@ -169,7 +167,7 @@ class BleManagerGattWriteOperationsTest {
     @Test
     fun testSendData_simpleData_sendFail_oldAPI_expectTrue() = runTest {
         val value = ByteArray(1)
-        
+
         every { bluetoothGattMock.writeCharacteristic(bluetoothCharacteristicMock) } answers {
             callbackSlot.captured.onCharacteristicRead(bluetoothGattMock, bluetoothCharacteristicMock, value, BluetoothGatt.GATT_SUCCESS)
             false
@@ -185,7 +183,7 @@ class BleManagerGattWriteOperationsTest {
     @Test
     fun testSendData_simpleData_sendFail_newAPI_expectTrue() = runTest {
         val value = ByteArray(1)
-        
+
         every {
             bluetoothGattMock.writeCharacteristic(
                 bluetoothCharacteristicMock,
@@ -208,7 +206,7 @@ class BleManagerGattWriteOperationsTest {
     @Test
     fun testSendData_simpleData_noResponse_oldAPI_expectTimeOutException() = runTest {
         val value = ByteArray(1)
-        
+
         every { bluetoothGattMock.writeCharacteristic(bluetoothCharacteristicMock) } answers {
             true
         }
@@ -242,7 +240,7 @@ class BleManagerGattWriteOperationsTest {
     @Test
     fun testSendData_simpleData_NullCharacteristic_oldAPI_expectException() = runTest {
         val value = ByteArray(1)
-        
+
         coEvery { bluetoothGattMock.getService(serviceUUID)?.getCharacteristic(characteristicUUID) } returns null
 
         Assert.assertThrows(SimpleBleClientException::class.java) {
@@ -256,7 +254,7 @@ class BleManagerGattWriteOperationsTest {
     @Test
     fun testSendData_simpleData_exception_oldAPI_expectException() = runTest {
         val value = ByteArray(1)
-        
+
         every { bluetoothGattMock.writeCharacteristic(bluetoothCharacteristicMock) } throws Exception()
 
         Assert.assertThrows(SimpleBleClientException::class.java) {

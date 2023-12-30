@@ -60,14 +60,12 @@ class BleManagerGattCallBacksTest {
         }
     }
 
-
     @Test
     fun waitForConnectionEstablished_initConnectOperation_not_called_expectException() = runTest {
         assertThrows(UninitializedPropertyAccessException::class.java) {
             runBlocking {
                 bleManagerGattCallBacks.waitForConnectionEstablished()
             }
-
         }
     }
 
@@ -77,7 +75,6 @@ class BleManagerGattCallBacksTest {
             runBlocking {
                 bleManagerGattCallBacks.waitForDataRead()
             }
-
         }
     }
 
@@ -87,7 +84,6 @@ class BleManagerGattCallBacksTest {
             runBlocking {
                 bleManagerGattCallBacks.waitForWrittenDescriptor()
             }
-
         }
     }
 
@@ -97,7 +93,6 @@ class BleManagerGattCallBacksTest {
             runBlocking {
                 bleManagerGattCallBacks.waitForDisconnected()
             }
-
         }
     }
 
@@ -107,7 +102,6 @@ class BleManagerGattCallBacksTest {
             runBlocking {
                 bleManagerGattCallBacks.waitForServicesDiscovered()
             }
-
         }
     }
 
@@ -142,7 +136,6 @@ class BleManagerGattCallBacksTest {
             )
         }
 
-
         assertEquals(receivedMessage, bleManagerGattCallBacks.waitForDataRead())
         coVerify { bleNetworkMessageProcessor.processSimpleMessage(value.toUByteArray()) }
     }
@@ -166,7 +159,6 @@ class BleManagerGattCallBacksTest {
             )
         }
 
-
         assertEquals(receivedMessage, bleManagerGattCallBacks.waitForDataRead())
         coVerify { bleNetworkMessageProcessor.processMessage(value.toUByteArray()) }
     }
@@ -185,7 +177,6 @@ class BleManagerGattCallBacksTest {
             bleManagerGattCallBacks.onCharacteristicChanged(bluetoothGattMock, bluetoothGattCharacteristicMock, value)
         }
 
-
         assertEquals(receivedMessage, bleManagerGattCallBacks.waitForDataRead())
         coVerify { bleNetworkMessageProcessor.processSimpleMessage(value.toUByteArray()) }
     }
@@ -203,7 +194,6 @@ class BleManagerGattCallBacksTest {
             Thread.sleep(100)
             bleManagerGattCallBacks.onCharacteristicChanged(bluetoothGattMock, bluetoothGattCharacteristicMock, value)
         }
-
 
         assertEquals(receivedMessage, bleManagerGattCallBacks.waitForDataRead())
         coVerify { bleNetworkMessageProcessor.processMessage(value.toUByteArray()) }
@@ -267,7 +257,6 @@ class BleManagerGattCallBacksTest {
                 bleManagerGattCallBacks.waitForConnectionEstablished()
             }
         }
-
     }
 
     @Test
@@ -296,7 +285,6 @@ class BleManagerGattCallBacksTest {
 
     @Test
     fun waitForWrittenDescriptor_errorOnWriteDescriptorOperation_expectException() = runTest {
-
         bleManagerGattCallBacks.initWriteDescriptorOperation()
 
         thread {
@@ -309,7 +297,6 @@ class BleManagerGattCallBacksTest {
                 bleManagerGattCallBacks.waitForWrittenDescriptor()
             }
         }
-
     }
 
     @Test
@@ -357,7 +344,6 @@ class BleManagerGattCallBacksTest {
         bleManagerGattCallBacks.initDisconnectOperation()
         bleManagerGattCallBacks.initDiscoverServicesOperation()
 
-
         // Perform reset
         bleManagerGattCallBacks.reset()
 
@@ -397,6 +383,4 @@ class BleManagerGattCallBacksTest {
     fun reset_whenNonInitialized_expectJustRuns() = runTest {
         bleManagerGattCallBacks.reset()
     }
-
-
 }

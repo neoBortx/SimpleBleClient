@@ -9,10 +9,9 @@ class BleDeviceScannerCallbackBuilder {
         onResult: (BluetoothDevice) -> Unit,
         onFailure: () -> Unit
     ): ScanCallback {
-
         return object : ScanCallback() {
             override fun onScanResult(callbackType: Int, result: ScanResult?) {
-                //super.onScanResult(callbackType, result)
+                // super.onScanResult(callbackType, result)
                 result?.device?.let {
                     onResult(it)
                 } ?: onFailure()
@@ -28,10 +27,9 @@ class BleDeviceScannerCallbackBuilder {
             }
 
             override fun onScanFailed(errorCode: Int) {
-                //super.onScanFailed(errorCode)
+                // super.onScanFailed(errorCode)
                 onFailure()
             }
-
         }
     }
 }

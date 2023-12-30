@@ -14,7 +14,6 @@ class BleNetworkMessageProcessor {
         private const val GENERAL_HEADER_SIZE = 1
         private const val BITS_8 = 8
         private const val BITS_5 = 5
-
     }
 
     private enum class Mask(val value: UByte) {

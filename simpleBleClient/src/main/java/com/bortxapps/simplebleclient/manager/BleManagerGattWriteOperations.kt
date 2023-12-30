@@ -40,7 +40,6 @@ internal class BleManagerGattWriteOperations(
             Log.e("BleManager", "writeCharacteristic characteristic is null")
             throw SimpleBleClientException(BleError.SEND_COMMAND_FAILED)
         }
-
     }
 
     @Suppress("DEPRECATION")
@@ -59,7 +58,6 @@ internal class BleManagerGattWriteOperations(
                     value,
                     BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
                 ) == BluetoothStatusCodes.SUCCESS
-
             } else {
                 bluetoothGatt.writeCharacteristic(characteristic.apply { this.value = value })
             }
@@ -68,7 +66,6 @@ internal class BleManagerGattWriteOperations(
                 launchDeferredOperation {
                     bleManagerGattCallBacks.waitForDataRead()
                 }
-
             } else {
                 null
             }

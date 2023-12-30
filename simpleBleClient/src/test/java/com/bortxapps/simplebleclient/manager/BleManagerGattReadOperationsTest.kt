@@ -44,6 +44,7 @@ class BleManagerGattReadOperationsTest {
 
     @OptIn(ExperimentalUnsignedTypes::class)
     private val value = ByteArray(1).toUByteArray()
+
     @OptIn(ExperimentalUnsignedTypes::class)
     private val bleNetworkMessage = BleNetworkMessage(1, 1, value)
 
@@ -57,7 +58,7 @@ class BleManagerGattReadOperationsTest {
         mutex = Mutex()
         bleManagerGattCallBacks = spyk(BleManagerGattCallBacks(bleNetworkMessageProcessorMock))
         bleManagerGattReadOperations = spyk(BleManagerGattReadOperations(bleManagerGattCallBacks, mutex, bleConfiguration))
-        
+
         every { bluetoothDeviceMock.name } returns goProName
         every { bluetoothDeviceMock.address } returns goProAddress
 
@@ -110,7 +111,6 @@ class BleManagerGattReadOperationsTest {
             callbackSlot.captured.onCharacteristicRead(bluetoothGattMock, bluetoothCharacteristicMock, value, BluetoothGatt.GATT_SUCCESS)
             false
         }
-
 
         Assert.assertThrows(SimpleBleClientException::class.java) {
             runBlocking {

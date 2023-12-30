@@ -1,10 +1,13 @@
-@Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.klint)
 }
 
 android {
+    val versionLib = project.property("VERSION_LIB")
+
     namespace = "com.bortxapps.simplebleclient"
     compileSdk = 33
 
@@ -16,8 +19,14 @@ android {
     }
 
     buildTypes {
-        release {
+        debug {
+            version = "$versionLib-alpha01-debug"
             isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+        release {
+            version = "$versionLib-release"
+            isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
