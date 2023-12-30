@@ -42,31 +42,37 @@ internal class BleManager(
         bleManagerDeviceConnection.getDevicesByService(serviceUUID)
     }
 
-    override suspend fun getPairedDevicesByPrefix(context: Context, deviceNamePrefix: String) = launchBleOperationWithValidations(context) {
-        bleManagerDeviceConnection.getPairedDevicesByPrefix(context, deviceNamePrefix)
-    }
+    override suspend fun getPairedDevicesByPrefix(context: Context, deviceNamePrefix: String) =
+        launchBleOperationWithValidations(context) {
+            bleManagerDeviceConnection.getPairedDevicesByPrefix(context, deviceNamePrefix)
+        }
 
-    override suspend fun stopSearchDevices() = launchBleOperationWithValidations(context) { bleManagerDeviceConnection.stopSearchDevices() }
+    override suspend fun stopSearchDevices() =
+        launchBleOperationWithValidations(context) {
+            bleManagerDeviceConnection.stopSearchDevices()
+        }
     //endregion
 
     //region connection
-    override suspend fun connectToDevice(context: Context, address: String): Boolean = launchBleOperationWithValidations(context) {
-        bleManagerGattConnectionOperations.connectToDevice(context, address, bleManagerGattCallBacks)?.let {
-            bluetoothGatt = it
-        } ?: throw SimpleBleClientException(BleError.CAMERA_NOT_CONNECTED)
-        true
-    }
-
-    override suspend fun subscribeToCharacteristicChanges(characteristicsUUid: List<UUID>): Boolean = launchBleOperationWithValidations(context) {
-        checkGatt()
-        if (bleManagerGattConnectionOperations.discoverServices(bluetoothGatt!!)) {
-            bleManagerGattSubscriptions.subscribeToNotifications(bluetoothGatt!!, characteristicsUUid)
+    override suspend fun connectToDevice(context: Context, address: String): Boolean =
+        launchBleOperationWithValidations(context) {
+            bleManagerGattConnectionOperations.connectToDevice(context, address, bleManagerGattCallBacks)?.let {
+                bluetoothGatt = it
+            } ?: throw SimpleBleClientException(BleError.CAMERA_NOT_CONNECTED)
             true
-        } else {
-            Log.e("BleManager", "discoverServices failed")
-            false
         }
-    }
+
+    override suspend fun subscribeToCharacteristicChanges(characteristicsUUid: List<UUID>): Boolean =
+        launchBleOperationWithValidations(context) {
+            checkGatt()
+            if (bleManagerGattConnectionOperations.discoverServices(bluetoothGatt!!)) {
+                bleManagerGattSubscriptions.subscribeToNotifications(bluetoothGatt!!, characteristicsUUid)
+                true
+            } else {
+                Log.e("BleManager", "discoverServices failed")
+                false
+            }
+        }
 
     override suspend fun disconnect() = launchBleOperationWithValidations(context) {
         checkGatt()

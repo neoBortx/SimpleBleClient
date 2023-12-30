@@ -1,10 +1,12 @@
 [versions]
-agp = "8.2.0-rc03"
+agp = "8.2.0"
 kotlin = "1.9.10"
 core-ktx = "1.12.0"
 junit = "4.13.2"
 androidx-test-ext-junit = "1.1.5"
 klint = "11.6.1"
+detekt = "1.23.0"
+coroutines = "1.7.3"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -12,15 +14,16 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
 
 #Coroutines
-kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.7.3" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 
 #Testing
 mockk = { group = "io.mockk", name = "mockk", version = "1.13.8" }
 turbine = { group = "app.cash.turbine", name = "turbine", version = "1.0.0" }
-kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version = "1.5.2" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 
 [plugins]
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 klint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "klint" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 
