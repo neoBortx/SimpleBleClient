@@ -4,7 +4,7 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 
-class BleDeviceScannerCallbackBuilder {
+internal class BleDeviceScannerCallbackBuilder {
     fun buildScanCallback(
         onResult: (BluetoothDevice) -> Unit,
         onFailure: () -> Unit

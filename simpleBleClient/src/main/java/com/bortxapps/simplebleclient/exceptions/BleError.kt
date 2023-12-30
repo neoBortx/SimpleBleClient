@@ -1,6 +1,6 @@
 package com.bortxapps.simplebleclient.exceptions
 
-enum class BleError {
+public enum class BleError {
     BLE_DEVICE_NOT_FOUND,
     CAMERA_NOT_CONNECTED,
     MISSING_BLE_PERMISSIONS,
