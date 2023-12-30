@@ -1,3 +1,5 @@
+@file:Suppress("KDocUnresolvedReference")
+
 package com.bortxapps.simplebleclient.api.contracts
 
 import android.bluetooth.BluetoothDevice
@@ -8,21 +10,24 @@ import java.util.UUID
 
 public interface SimpleBleClientDeviceSeeker {
     /**
-     * TODO make another method to filter by prefix before release
-     * Retrieves a flow of BLE devices that offers a specified service. This operation has a timeout of 30 seconds.
+     * Retrieves a flow of BLE devices that offers a specified service. This operation has a timeout of 10 seconds by default.
+     * The timeout can be changed calling [SimpleBleClientBuilder.setOperationTimeOutMillis] in builder.
      * Launch inside a coroutine to avoid blocking the main thread.
+     *
+     * You can filter by service UUID and/or device name. If you don't want to filter by service UUID or device name just leave them null
      *
      * You can launch this operation just once at a time. If you need to launch it more than once, you need to wait
      * for the previous one to finish or call [stopSearchDevices] to stop the previous one. If not a
      * [SimpleBleClientException] will be thrown.
      *
      * @param serviceUUID The UUID of the BLE service to filter devices.
+     * @param deviceName The name of the BLE device to filter devices.
      * @return A flow of [BluetoothDevice] instances that offer the specified service.
      *
      * @throws SimpleBleClientException Thrown when an error occurs during the BLE operation.
      *
      */
-    public suspend fun getDevicesByService(serviceUUID: UUID): Flow<BluetoothDevice>
+    public suspend fun getDevicesNearby(serviceUUID: UUID? = null, deviceName: String? = null): Flow<BluetoothDevice>
 
     /**
      * TODO erase before release or make generic

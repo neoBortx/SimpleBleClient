@@ -40,7 +40,8 @@ public interface SimpleBleClientConnection {
     /**
      * Subscribes to changes of specified BLE characteristics.
      *
-     * @param characteristicsUUid A list of UUIDs for the characteristics to monitor.
+     * @param characteristicsUUid A list of UUIDs for the characteristics to monitor. If the list is empty,
+     *                           all characteristics Noticeable and Indictable will be monitored.
      * @return A Boolean indicating the success or failure of the subscription.
      *
      * @throws SimpleBleClientException Thrown when an error occurs during the BLE operation.

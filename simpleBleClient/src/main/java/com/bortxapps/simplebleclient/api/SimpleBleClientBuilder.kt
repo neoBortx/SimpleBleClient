@@ -32,7 +32,10 @@ import com.bortxapps.simplebleclient.manager.BleManager
  */
 public object SimpleBleClientBuilder {
     private var operationTimeOutMillis: Long? = null
+    private var scanPeriodMillis: Long? = null
     public fun setOperationTimeOutMillis(timeout: Long): SimpleBleClientBuilder = apply { operationTimeOutMillis = timeout }
+
+    public fun setScanPeriodMillis(timeout: Long): SimpleBleClientBuilder = apply { scanPeriodMillis = timeout }
     public fun build(context: Context): SimpleBleClient {
         return buildInstance(context)
     }
@@ -40,6 +43,7 @@ public object SimpleBleClientBuilder {
     private fun buildInstance(context: Context): SimpleBleClient {
         val container = BleLibraryContainer(context)
         operationTimeOutMillis?.let { container.bleConfiguration.operationTimeoutMillis = it }
+        scanPeriodMillis?.let { container.bleConfiguration.scanPeriodMillis = it }
         return BleManager(
             container.bleManagerDeviceSearchOperations,
             container.bleManagerGattConnectionOperations,

@@ -79,7 +79,7 @@ internal class BleManagerGattSubscriptions(
         properties and BluetoothGattCharacteristic.PROPERTY_INDICATE != 0
 
     private fun filterResponseCharacteristic(characteristic: BluetoothGattCharacteristic, characteristicsUUid: List<UUID>): Boolean {
-        return characteristicsUUid.any { it == characteristic.uuid }
+        return characteristicsUUid.isEmpty() || characteristicsUUid.any { it == characteristic.uuid }
     }
 
     private fun getDescriptionValueToSubscribe(characteristic: BluetoothGattCharacteristic): ByteArray {

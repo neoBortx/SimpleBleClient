@@ -9,12 +9,15 @@ import android.os.Looper
 import app.cash.turbine.test
 import com.bortxapps.simplebleclient.exceptions.BleError
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
+import com.bortxapps.simplebleclient.manager.BleConfiguration
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.slot
+import io.mockk.spyk
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -30,15 +33,18 @@ internal class BleDeviceScannerTest {
     private val bluetoothAdapterMock = mockk<android.bluetooth.BluetoothAdapter> {
         every { bluetoothLeScanner } returns bluetoothLeScannerMock
     }
-    private val bleDeviceScannerFilterBuilderMock = mockk<BleDeviceScannerFilterBuilder>(relaxed = true)
+    private val bleDeviceScannerFilterBuilderMock = spyk(BleDeviceScannerFilterBuilder(), recordPrivateCalls = true)
     private val bleDeviceScannerSettingsBuilderMock = mockk<BleDeviceScannerSettingsBuilder>(relaxed = true)
+    private val bleConfiguration = BleConfiguration()
 
     private val serviceUuid = UUID.randomUUID()
+    private val deviceName = "Name"
     private var bleDeviceScanner = BleDeviceScannerManager(
         bluetoothLeScannerMock,
         bleDeviceScannerSettingsBuilderMock,
         bleDeviceScannerFilterBuilderMock,
-        BleDeviceScannerCallbackBuilder()
+        BleDeviceScannerCallbackBuilder(),
+        bleConfiguration
     )
 
     @Before
@@ -51,8 +57,8 @@ internal class BleDeviceScannerTest {
         }
         every { Looper.getMainLooper() } returns looper
 
-        every { bleDeviceScannerFilterBuilderMock.buildFilters(serviceUuid) } returns mockk(relaxed = true)
-        every { bleDeviceScannerSettingsBuilderMock.buildScanSettings() } returns mockk(relaxed = true)
+        coEvery { bleDeviceScannerFilterBuilderMock.buildFilterByService(serviceUuid) } returns mockk(relaxed = true)
+        coEvery { bleDeviceScannerFilterBuilderMock.buildFilterByDeviceName(deviceName) } returns mockk(relaxed = true)
     }
 
     @Test
@@ -75,9 +81,13 @@ internal class BleDeviceScannerTest {
             )
         }
 
-        bleDeviceScanner.scanBleDevicesNearby(serviceUuid).test {
+        bleDeviceScanner.scanBleDevicesNearby(serviceUuid, deviceName).test {
             assertEquals(bluetoothDeviceMock, awaitItem())
         }
+
+        coVerify(exactly = 1) { bleDeviceScannerFilterBuilderMock.buildFilterByService(serviceUuid) }
+        coVerify(exactly = 1) { bleDeviceScannerFilterBuilderMock.buildFilterByDeviceName(deviceName) }
+
     }
 
     @Test
@@ -98,7 +108,7 @@ internal class BleDeviceScannerTest {
             )
         }
 
-        bleDeviceScanner.scanBleDevicesNearby(serviceUuid).test {
+        bleDeviceScanner.scanBleDevicesNearby(serviceUuid, deviceName).test {
             assertEquals(BleError.CANNOT_START_SEARCHING_DEVICES, (this.awaitError() as SimpleBleClientException).bleError)
         }
     }
@@ -123,7 +133,7 @@ internal class BleDeviceScannerTest {
             )
         }
 
-        bleDeviceScanner.scanBleDevicesNearby(serviceUuid).test {
+        bleDeviceScanner.scanBleDevicesNearby(serviceUuid, deviceName).test {
             assertEquals(BleError.CANNOT_START_SEARCHING_DEVICES, (this.awaitError() as SimpleBleClientException).bleError)
         }
     }
@@ -147,7 +157,7 @@ internal class BleDeviceScannerTest {
             )
         }
 
-        bleDeviceScanner.scanBleDevicesNearby(serviceUuid).test {
+        bleDeviceScanner.scanBleDevicesNearby(serviceUuid, deviceName).test {
             assertEquals(bluetoothDeviceMock, awaitItem())
             assertEquals(bluetoothDeviceMock, awaitItem())
             assertEquals(bluetoothDeviceMock, awaitItem())
@@ -171,7 +181,7 @@ internal class BleDeviceScannerTest {
             )
         }
 
-        bleDeviceScanner.scanBleDevicesNearby(serviceUuid).test {
+        bleDeviceScanner.scanBleDevicesNearby(serviceUuid, deviceName).test {
             assertEquals(BleError.CANNOT_START_SEARCHING_DEVICES, (this.awaitError() as SimpleBleClientException).bleError)
         }
     }
@@ -197,7 +207,7 @@ internal class BleDeviceScannerTest {
             )
         }
 
-        bleDeviceScanner.scanBleDevicesNearby(serviceUuid).test {
+        bleDeviceScanner.scanBleDevicesNearby(serviceUuid, deviceName).test {
             assertEquals(bluetoothDeviceMock, awaitItem())
             assertEquals(BleError.CANNOT_START_SEARCHING_DEVICES, (this.awaitError() as SimpleBleClientException).bleError)
         }
@@ -220,7 +230,7 @@ internal class BleDeviceScannerTest {
             )
         }
 
-        bleDeviceScanner.scanBleDevicesNearby(serviceUuid).test {
+        bleDeviceScanner.scanBleDevicesNearby(serviceUuid, deviceName).test {
             expectNoEvents()
         }
     }
@@ -240,7 +250,7 @@ internal class BleDeviceScannerTest {
             )
         } throws Exception("Mock exception")
 
-        bleDeviceScanner.scanBleDevicesNearby(serviceUuid).test {
+        bleDeviceScanner.scanBleDevicesNearby(serviceUuid, deviceName).test {
             assertEquals(BleError.CANNOT_START_SEARCHING_DEVICES, (this.awaitError() as SimpleBleClientException).bleError)
         }
     }
@@ -259,7 +269,7 @@ internal class BleDeviceScannerTest {
             callbackSlot.captured.onScanFailed(0)
         }
 
-        bleDeviceScanner.scanBleDevicesNearby(serviceUuid).test {
+        bleDeviceScanner.scanBleDevicesNearby(serviceUuid, deviceName).test {
             assertEquals(BleError.CANNOT_START_SEARCHING_DEVICES, (this.awaitError() as SimpleBleClientException).bleError)
         }
     }
@@ -284,7 +294,7 @@ internal class BleDeviceScannerTest {
             )
         }
 
-        val flow = bleDeviceScanner.scanBleDevicesNearby(serviceUuid)
+        val flow = bleDeviceScanner.scanBleDevicesNearby(serviceUuid, deviceName)
 
         flow.test {
             awaitItem()
@@ -299,12 +309,14 @@ internal class BleDeviceScannerTest {
         val callbackSlot = slot<ScanCallback>()
         val scanResultMock = mockk<ScanResult>(relaxed = true)
         every { scanResultMock.device } returns bluetoothDeviceMock
+        bleConfiguration.scanPeriodMillis = 60
 
         bleDeviceScanner = BleDeviceScannerManager(
             bluetoothLeScannerMock,
             bleDeviceScannerSettingsBuilderMock,
             bleDeviceScannerFilterBuilderMock,
-            BleDeviceScannerCallbackBuilder()
+            BleDeviceScannerCallbackBuilder(),
+            bleConfiguration
         )
 
         // Mock BLE scan results
@@ -318,7 +330,7 @@ internal class BleDeviceScannerTest {
         }
 
         runBlocking {
-            val flow = bleDeviceScanner.scanBleDevicesNearby(serviceUuid, 500)
+            val flow = bleDeviceScanner.scanBleDevicesNearby(serviceUuid, deviceName)
 
             flow.test {
                 expectNoEvents()

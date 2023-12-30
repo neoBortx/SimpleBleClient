@@ -19,11 +19,11 @@ internal class BleManagerDeviceSearchOperations(
 
     private var searchingDevices = false
     private val detectedDevices = mutableListOf<BluetoothDevice>()
-    fun getDevicesByService(serviceUUID: UUID): Flow<BluetoothDevice> {
+    fun getDevicesByService(serviceUUID: UUID?, deviceName: String?): Flow<BluetoothDevice> {
         if (!searchingDevices) {
             searchingDevices = true
             detectedDevices.clear()
-            return bleScanner.scanBleDevicesNearby(serviceUUID).onEach {
+            return bleScanner.scanBleDevicesNearby(serviceUUID, deviceName).onEach {
                 detectedDevices += it
             }.onCompletion {
                 searchingDevices = false

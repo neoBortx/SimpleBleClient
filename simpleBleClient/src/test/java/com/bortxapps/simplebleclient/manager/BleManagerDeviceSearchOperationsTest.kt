@@ -55,12 +55,12 @@ internal class BleManagerDeviceSearchOperationsTest {
     //region getDevicesByService
     @Test
     fun testGetDevicesByServiceReturnListOfDevicesAndKeepRunning() = runTest {
-        coEvery { bleScannerMock.scanBleDevicesNearby(serviceUUID) } returns flow {
+        coEvery { bleScannerMock.scanBleDevicesNearby(serviceUUID, null) } returns flow {
             emit(bluetoothDeviceMock)
             emit(bluetoothDeviceMock2)
         }
 
-        bleManagerDeviceConnection.getDevicesByService(serviceUUID).test {
+        bleManagerDeviceConnection.getDevicesByService(serviceUUID, null).test {
             TestCase.assertEquals(bluetoothDeviceMock, awaitItem())
             TestCase.assertEquals(bluetoothDeviceMock2, awaitItem())
             awaitComplete()
@@ -72,29 +72,29 @@ internal class BleManagerDeviceSearchOperationsTest {
 
     @Test
     fun testGetDevicesByServiceLaunchTwice_expectException() = runTest {
-        coEvery { bleScannerMock.scanBleDevicesNearby(serviceUUID) } returns flow {
+        coEvery { bleScannerMock.scanBleDevicesNearby(serviceUUID, null) } returns flow {
             emit(bluetoothDeviceMock)
         }
 
-        bleManagerDeviceConnection.getDevicesByService(serviceUUID)
+        bleManagerDeviceConnection.getDevicesByService(serviceUUID, null)
 
         Assert.assertThrows(SimpleBleClientException::class.java) {
-            bleManagerDeviceConnection.getDevicesByService(serviceUUID)
+            bleManagerDeviceConnection.getDevicesByService(serviceUUID, null)
         }
     }
 
     @Test
     fun testGetDevicesByServiceConsumeTwice_expectNoException() = runTest {
-        coEvery { bleScannerMock.scanBleDevicesNearby(serviceUUID) } returns flow {
+        coEvery { bleScannerMock.scanBleDevicesNearby(serviceUUID, null) } returns flow {
             emit(bluetoothDeviceMock)
         }
 
-        bleManagerDeviceConnection.getDevicesByService(serviceUUID).test {
+        bleManagerDeviceConnection.getDevicesByService(serviceUUID, null).test {
             TestCase.assertEquals(bluetoothDeviceMock, awaitItem())
             awaitComplete()
         }
 
-        bleManagerDeviceConnection.getDevicesByService(serviceUUID).test {
+        bleManagerDeviceConnection.getDevicesByService(serviceUUID, null).test {
             TestCase.assertEquals(bluetoothDeviceMock, awaitItem())
             awaitComplete()
         }
