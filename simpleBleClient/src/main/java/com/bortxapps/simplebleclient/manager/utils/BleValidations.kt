@@ -16,12 +16,13 @@ internal fun checkBluetoothEnabled(context: Context) {
 
 internal fun checkPermissionsApiCodeS(context: Context) =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && (
-            context.checkSelfPermission(android.Manifest.permission.BLUETOOTH_CONNECT) != PERMISSION_GRANTED
-                    || context.checkSelfPermission(android.Manifest.permission.BLUETOOTH_SCAN) != PERMISSION_GRANTED)
+        context.checkSelfPermission(android.Manifest.permission.BLUETOOTH_CONNECT) != PERMISSION_GRANTED ||
+            context.checkSelfPermission(android.Manifest.permission.BLUETOOTH_SCAN) != PERMISSION_GRANTED
+        )
 
 internal fun checkPermissionsOldApi(context: Context) =
-    Build.VERSION.SDK_INT < Build.VERSION_CODES.S
-            && (context.checkSelfPermission(android.Manifest.permission.BLUETOOTH) != PERMISSION_GRANTED)
+    Build.VERSION.SDK_INT < Build.VERSION_CODES.S &&
+        (context.checkSelfPermission(android.Manifest.permission.BLUETOOTH) != PERMISSION_GRANTED)
 
 internal fun checkPermissions(context: Context) {
     if (checkPermissionsApiCodeS(context) || checkPermissionsOldApi(context)) {

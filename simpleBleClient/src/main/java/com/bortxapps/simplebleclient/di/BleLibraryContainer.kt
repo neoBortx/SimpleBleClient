@@ -21,7 +21,7 @@ import com.bortxapps.simplebleclient.scanner.BleDeviceScannerSettingsBuilder
 import kotlinx.coroutines.sync.Mutex
 
 internal class BleLibraryContainer(context: Context) {
-    //ble
+    // ble
     private val blueToothScanner = ContextCompat.getSystemService(context.applicationContext, BluetoothManager::class.java)?.adapter?.bluetoothLeScanner
         ?: throw SimpleBleClientException(BleError.UNABLE_INITIALIZE_CONTROLLER)
 

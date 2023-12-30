@@ -76,8 +76,6 @@ private fun getBluetoothGattCallback(
         }
     }
 
-
-
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalUnsignedTypes::class)
 internal fun connectToGoProBleDevice(

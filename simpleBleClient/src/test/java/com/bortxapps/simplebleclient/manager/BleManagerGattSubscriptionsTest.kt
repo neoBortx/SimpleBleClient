@@ -40,7 +40,6 @@ class BleManagerGattSubscriptionsTest {
 
     private val bleManagerDeviceConnectionMock = mockk<BleManagerDeviceSearchOperations>(relaxed = true)
 
-
     private lateinit var bleManagerGattSubscriptions: BleManagerGattSubscriptions
     private lateinit var bleManagerGattCallBacks: BleManagerGattCallBacks
     private lateinit var bleConfiguration: BleConfiguration
@@ -78,7 +77,6 @@ class BleManagerGattSubscriptionsTest {
         every { bleManagerGattSubscriptions invokeNoArgs "getEnableIndicationValue" } returns enableIndicationValue
         every { bleManagerGattSubscriptions invokeNoArgs "getEnableNotificationValue" } returns enableNotificationValue
 
-
         every { bluetoothDeviceMock.connectGatt(any(), any(), capture(callbackSlot)) } answers {
             bluetoothGattMock
         }
@@ -101,7 +99,6 @@ class BleManagerGattSubscriptionsTest {
         coEvery { bluetoothGattServiceMock.characteristics } returns listOf(bluetoothCharacteristicMock)
         coEvery { bluetoothGattMock.services } returns listOf(bluetoothGattServiceMock)
         coEvery { bluetoothGattMock.setCharacteristicNotification(bluetoothCharacteristicMock, true) } returns true
-
 
         coEvery {
             bluetoothGattMock.writeDescriptor(bleBluetoothGattDescriptorMock, enableNotificationValue)
@@ -147,27 +144,27 @@ class BleManagerGattSubscriptionsTest {
 
     @Test
     fun oneCharacteristics_SubscriptionIndicationProperty_CQ_SETTING_RSP_newSdk_DescriptorReceived_expectSuccess() = runTest {
-            every { buildVersionProviderMock.getSdkVersion() } returns Build.VERSION_CODES.TIRAMISU
-            coEvery { bleManagerDeviceConnectionMock.getDetectedDevices() } returns mutableListOf(bluetoothDeviceMock)
-            coEvery { bluetoothCharacteristicMock.properties } returns BluetoothGattCharacteristic.PROPERTY_INDICATE
-            coEvery { bluetoothCharacteristicMock.uuid } returns characteristic
-            coEvery { bluetoothCharacteristicMock.getDescriptor(UUID.fromString(descriptionUUID)) } returns bleBluetoothGattDescriptorMock
-            coEvery { bluetoothGattServiceMock.characteristics } returns listOf(bluetoothCharacteristicMock)
-            coEvery { bluetoothGattMock.services } returns listOf(bluetoothGattServiceMock)
-            coEvery { bluetoothGattMock.setCharacteristicNotification(bluetoothCharacteristicMock, true) } returns true
+        every { buildVersionProviderMock.getSdkVersion() } returns Build.VERSION_CODES.TIRAMISU
+        coEvery { bleManagerDeviceConnectionMock.getDetectedDevices() } returns mutableListOf(bluetoothDeviceMock)
+        coEvery { bluetoothCharacteristicMock.properties } returns BluetoothGattCharacteristic.PROPERTY_INDICATE
+        coEvery { bluetoothCharacteristicMock.uuid } returns characteristic
+        coEvery { bluetoothCharacteristicMock.getDescriptor(UUID.fromString(descriptionUUID)) } returns bleBluetoothGattDescriptorMock
+        coEvery { bluetoothGattServiceMock.characteristics } returns listOf(bluetoothCharacteristicMock)
+        coEvery { bluetoothGattMock.services } returns listOf(bluetoothGattServiceMock)
+        coEvery { bluetoothGattMock.setCharacteristicNotification(bluetoothCharacteristicMock, true) } returns true
 
-            coEvery {
-                bluetoothGattMock.writeDescriptor(bleBluetoothGattDescriptorMock, enableIndicationValue)
-            } answers {
-                callbackSlot.captured.onDescriptorWrite(bluetoothGattMock, bleBluetoothGattDescriptorMock, BluetoothGatt.GATT_SUCCESS)
-                0
-            }
-
-            bleManagerGattSubscriptions.subscribeToNotifications(bluetoothGattMock, characteristics)
-
-            verify { bluetoothGattMock.setCharacteristicNotification(bluetoothCharacteristicMock, true) }
-            verify { bluetoothGattMock.writeDescriptor(bleBluetoothGattDescriptorMock, enableIndicationValue) }
+        coEvery {
+            bluetoothGattMock.writeDescriptor(bleBluetoothGattDescriptorMock, enableIndicationValue)
+        } answers {
+            callbackSlot.captured.onDescriptorWrite(bluetoothGattMock, bleBluetoothGattDescriptorMock, BluetoothGatt.GATT_SUCCESS)
+            0
         }
+
+        bleManagerGattSubscriptions.subscribeToNotifications(bluetoothGattMock, characteristics)
+
+        verify { bluetoothGattMock.setCharacteristicNotification(bluetoothCharacteristicMock, true) }
+        verify { bluetoothGattMock.writeDescriptor(bleBluetoothGattDescriptorMock, enableIndicationValue) }
+    }
 
     @Suppress("DEPRECATION")
     @Test
@@ -317,5 +314,4 @@ class BleManagerGattSubscriptionsTest {
             }
         }
     }
-
 }

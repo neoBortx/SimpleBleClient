@@ -19,7 +19,6 @@ internal class BleManagerGattConnectionOperations(
 ) : BleManagerGattOperationBase(gattMutex, bleConfiguration) {
 
     suspend fun connectToDevice(context: Context, address: String, gattCallBacks: BluetoothGattCallback): BluetoothGatt? {
-
         bleManagerDeviceSearchOperations.getDetectedDevices().firstOrNull { it.address == address }?.let {
             return connect(context, it, gattCallBacks)
         } ?: run {
@@ -27,7 +26,6 @@ internal class BleManagerGattConnectionOperations(
             throw SimpleBleClientException(BleError.BLE_DEVICE_NOT_FOUND)
         }
     }
-
 
     @SuppressLint("MissingPermission")
     private suspend fun connect(
@@ -46,7 +44,7 @@ internal class BleManagerGattConnectionOperations(
 
     @SuppressLint("MissingPermission")
     suspend fun disconnect(
-        bluetoothGatt: BluetoothGatt,
+        bluetoothGatt: BluetoothGatt
     ): Boolean = launchGattOperation {
         bleManagerGattCallBacks.initDisconnectOperation()
         bluetoothGatt.disconnect()
@@ -56,14 +54,12 @@ internal class BleManagerGattConnectionOperations(
         true
     }
 
-
     @SuppressLint("MissingPermission")
     suspend fun freeConnection(
-        bluetoothGatt: BluetoothGatt,
+        bluetoothGatt: BluetoothGatt
     ) = launchGattOperation {
         bluetoothGatt.close()
     }
-
 
     @SuppressLint("MissingPermission")
     suspend fun discoverServices(bluetoothGatt: BluetoothGatt): Boolean = launchGattOperation {
@@ -73,6 +69,4 @@ internal class BleManagerGattConnectionOperations(
             bleManagerGattCallBacks.waitForServicesDiscovered()
         }
     }
-
-
 }

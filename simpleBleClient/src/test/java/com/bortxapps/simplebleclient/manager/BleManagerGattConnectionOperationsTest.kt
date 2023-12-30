@@ -36,7 +36,6 @@ class BleManagerGattConnectionOperationsTest {
 
     private val bleManagerDeviceConnectionMock = mockk<BleManagerDeviceSearchOperations>(relaxed = true)
 
-
     private lateinit var bleManagerGattConnectionOperations: BleManagerGattConnectionOperations
     private lateinit var bleManagerGattCallBacks: BleManagerGattCallBacks
     private lateinit var bleConfiguration: BleConfiguration
@@ -69,7 +68,6 @@ class BleManagerGattConnectionOperationsTest {
     fun testConnectToDeviceNotFoundDevice_expectFalse() = runTest {
         coEvery { bleManagerDeviceConnectionMock.getDetectedDevices() } returns mutableListOf(bluetoothDeviceMock)
 
-
         assertThrows(SimpleBleClientException::class.java) {
             runBlocking {
                 bleManagerGattConnectionOperations.connectToDevice(contextMock, "another_device_address", bleManagerGattCallBacks)
@@ -101,7 +99,6 @@ class BleManagerGattConnectionOperationsTest {
 
         coEvery {
             bluetoothGattMock.discoverServices()
-
         } answers {
             callbackSlot.captured.onServicesDiscovered(bluetoothGattMock, 0)
             true
@@ -189,10 +186,8 @@ class BleManagerGattConnectionOperationsTest {
         }
     }
 
-
     @Test
     fun testDisconnectGattDisconnectSuccess_responses_expectTrue() = runTest {
-
         every { bluetoothDeviceMock.connectGatt(any(), any(), capture(callbackSlot)) } answers {
             bluetoothGattMock
         }
@@ -279,10 +274,8 @@ class BleManagerGattConnectionOperationsTest {
         }
     }
 
-
     @Test
     fun testDiscoverServicesSuccess_responses_expectTrue() = runTest {
-
         every { bluetoothDeviceMock.connectGatt(any(), any(), capture(callbackSlot)) } answers {
             bluetoothGattMock
         }
@@ -298,5 +291,4 @@ class BleManagerGattConnectionOperationsTest {
     }
 
     //endregion
-
 }

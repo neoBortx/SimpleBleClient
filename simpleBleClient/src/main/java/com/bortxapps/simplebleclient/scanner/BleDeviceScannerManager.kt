@@ -42,12 +42,11 @@ internal class BleDeviceScannerManager(
             close()
         }
 
-
         val leScanCallback = configureScanCallback(onResult = {
             trySendBlocking(it)
         }, onFailure = {
-            close(SimpleBleClientException(BleError.CANNOT_START_SEARCHING_DEVICES))
-        })
+                close(SimpleBleClientException(BleError.CANNOT_START_SEARCHING_DEVICES))
+            })
 
         try {
             scanner.startScan(
@@ -55,7 +54,6 @@ internal class BleDeviceScannerManager(
                 bleDeviceScannerSettingsBuilder.buildScanSettings(),
                 leScanCallback
             )
-
         } catch (ex: Exception) {
             Log.e("BleManager", "Error starting scan ${ex.message} ${ex.stackTraceToString()}")
             close(SimpleBleClientException(BleError.CANNOT_START_SEARCHING_DEVICES))
@@ -67,7 +65,6 @@ internal class BleDeviceScannerManager(
                 close()
             }
         }
-
 
         awaitClose {
             Log.d("BleManager", "awaitClose")

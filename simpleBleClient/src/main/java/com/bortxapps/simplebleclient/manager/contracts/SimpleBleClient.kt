@@ -1,3 +1,3 @@
 package com.bortxapps.simplebleclient.manager.contracts
 
-interface SimpleBleClient: SimpleBleClientDeviceSeeker, SimpleBleClientConnection, SimpleBleClientReader, SimpleBleClientWriter
+interface SimpleBleClient : SimpleBleClientDeviceSeeker, SimpleBleClientConnection, SimpleBleClientReader, SimpleBleClientWriter

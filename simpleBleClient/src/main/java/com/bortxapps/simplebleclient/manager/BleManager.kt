@@ -99,7 +99,7 @@ internal class BleManager(
             characteristicUUID,
             data,
             bluetoothGatt!!,
-            complexResponse,
+            complexResponse
         )
     }
 
@@ -107,7 +107,7 @@ internal class BleManager(
         serviceUUID: UUID,
         characteristicUUID: UUID,
         complexResponse: Boolean
-    ): BleNetworkMessage = launchBleOperationWithValidations(context){
+    ): BleNetworkMessage = launchBleOperationWithValidations(context) {
         checkGatt()
         bleManagerGattReadOperations.readData(
             serviceUUID,

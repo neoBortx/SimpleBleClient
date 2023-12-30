@@ -37,7 +37,6 @@ import java.util.UUID
 
 class BleManagerTest {
 
-
     private val bleNetworkMessageProcessorMock = mockk<BleNetworkMessageProcessor>(relaxed = true)
     private val bluetoothDeviceMock = mockk<BluetoothDevice>(relaxed = true)
     private val bluetoothDeviceMock2 = mockk<BluetoothDevice>(relaxed = true)
@@ -127,7 +126,7 @@ class BleManagerTest {
     }
 
     @Test
-    fun `getPairedDevicesByPrefix should call BleManagerDeviceSearchOperations getPairedDevicesByPrefix`()= runTest {
+    fun `getPairedDevicesByPrefix should call BleManagerDeviceSearchOperations getPairedDevicesByPrefix`() = runTest {
         coEvery { bleManagerDeviceConnectionMock.getPairedDevicesByPrefix(contextMock, goProName) } returns listOf(bluetoothDeviceMock)
 
         bleManager.getPairedDevicesByPrefix(contextMock, goProName)
@@ -207,7 +206,6 @@ class BleManagerTest {
             bleManager.connectToDevice(contextMock, goProAddress)
             bleManager.disconnect()
             verify(exactly = 0) { bleManager["freeResources"]() }
-
         }
     }
 
@@ -225,7 +223,6 @@ class BleManagerTest {
         coEvery { bleManagerGattConnectionOperationsMock.disconnect(bluetoothGattMock) } returns true
         coEvery { bleManagerGattConnectionOperationsMock.freeConnection(bluetoothGattMock) } just runs
         coEvery { bleManagerGattCallBacksMock.reset() } just runs
-
 
         runBlocking {
             bleManager.connectToDevice(contextMock, goProAddress)
@@ -282,7 +279,6 @@ class BleManagerTest {
         runBlocking {
             bleManager.connectToDevice(contextMock, goProAddress)
             bleManager.sendData(serviceUUID, characteristicUUID, value.toByteArray(), false)
-
         }
     }
 
@@ -312,7 +308,6 @@ class BleManagerTest {
         runBlocking {
             bleManager.connectToDevice(contextMock, goProAddress)
             bleManager.sendData(serviceUUID, characteristicUUID, value.toByteArray(), true)
-
         }
     }
     //endregion
@@ -351,7 +346,6 @@ class BleManagerTest {
         runBlocking {
             bleManager.connectToDevice(contextMock, goProAddress)
             bleManager.readData(serviceUUID, characteristicUUID, false)
-
         }
     }
 
@@ -379,7 +373,6 @@ class BleManagerTest {
         runBlocking {
             bleManager.connectToDevice(contextMock, goProAddress)
             bleManager.readData(serviceUUID, characteristicUUID, true)
-
         }
     }
     //endregion
@@ -389,5 +382,4 @@ class BleManagerTest {
         coEvery { checkPermissions(any()) } returns Unit
         coEvery { checkBleHardwareAvailable(any()) } returns Unit
     }
-
 }

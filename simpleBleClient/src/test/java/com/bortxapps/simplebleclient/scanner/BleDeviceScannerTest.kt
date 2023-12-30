@@ -53,7 +53,6 @@ class BleDeviceScannerTest {
 
         every { bleDeviceScannerFilterBuilderMock.buildFilters(serviceUuid) } returns mockk(relaxed = true)
         every { bleDeviceScannerSettingsBuilderMock.buildScanSettings() } returns mockk(relaxed = true)
-
     }
 
     @Test
@@ -265,7 +264,6 @@ class BleDeviceScannerTest {
         }
     }
 
-
     @Test
     fun testStopSearchSuccessfulBleScanFindOneDevice() = runTest {
         val callbackSlot = slot<ScanCallback>()
@@ -286,9 +284,7 @@ class BleDeviceScannerTest {
             )
         }
 
-
         val flow = bleDeviceScanner.scanBleDevicesNearby(serviceUuid)
-
 
         flow.test {
             awaitItem()
@@ -319,7 +315,6 @@ class BleDeviceScannerTest {
                 capture(callbackSlot)
             )
         } answers {
-
         }
 
         runBlocking {
