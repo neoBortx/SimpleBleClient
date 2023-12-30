@@ -54,7 +54,8 @@ class BleManagerGattConnectionOperationsTest {
             operationTimeoutMillis = 20
         }
         bleManagerGattCallBacks = spyk(BleManagerGattCallBacks(bleNetworkMessageProcessorMock))
-        bleManagerGattConnectionOperations = spyk(BleManagerGattConnectionOperations(bleManagerDeviceConnectionMock, bleManagerGattCallBacks, mutex, bleConfiguration))
+        bleManagerGattConnectionOperations =
+            spyk(BleManagerGattConnectionOperations(bleManagerDeviceConnectionMock, bleManagerGattCallBacks, mutex, bleConfiguration))
 
         every { bluetoothDeviceMock.name } returns goProName
         every { bluetoothDeviceMock.address } returns goProAddress

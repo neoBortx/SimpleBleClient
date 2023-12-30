@@ -13,7 +13,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.concurrent.CancellationException
 
 @OptIn(ExperimentalUnsignedTypes::class)
-internal class BleManagerGattCallBacks(private val bleNetworkMessageProcessor: BleNetworkMessageProcessor) : BluetoothGattCallback() {
+internal class BleManagerGattCallBacks(private val bleNetworkMessageProcessor: BleNetworkMessageProcessor) :
+    BluetoothGattCallback() {
 
     //region completions
     private var onConnectionEstablishedDeferred: CompletableDeferred<Boolean>? = null
@@ -55,8 +56,16 @@ internal class BleManagerGattCallBacks(private val bleNetworkMessageProcessor: B
             connectionStatus.tryEmit(newState)
         } else {
             Log.e("BleManagerGattCallBacks", "onConnectionStateChange: FAIL - status $status")
-            onConnectionEstablishedDeferred?.cancel(CancellationException("Gatt Connection operation failed -> gat code $status"))
-            onDisconnectedDeferred?.cancel(CancellationException("Gatt Disconnection Operation failed -> gat code $status"))
+            onConnectionEstablishedDeferred?.cancel(
+                CancellationException(
+                    "Gatt Connection operation failed -> gat code $status"
+                )
+            )
+            onDisconnectedDeferred?.cancel(
+                CancellationException(
+                    "Gatt Disconnection Operation failed -> gat code $status"
+                )
+            )
         }
     }
 
@@ -88,7 +97,9 @@ internal class BleManagerGattCallBacks(private val bleNetworkMessageProcessor: B
             onServicesDiscoveredDeferred?.complete(true)
         } else {
             Log.e("BleManagerGattCallBacks", "onServicesDiscovered: FAIL - status $status")
-            onServicesDiscoveredDeferred?.cancel(CancellationException("Gatt Service discover operation failed -> gat code $status"))
+            onServicesDiscoveredDeferred?.cancel(
+                CancellationException("Gatt Service discover operation failed -> gat code $status")
+            )
         }
     }
 
@@ -97,7 +108,9 @@ internal class BleManagerGattCallBacks(private val bleNetworkMessageProcessor: B
             onDescriptorWriteDeferred?.complete(true)
         } else {
             Log.e("BleManagerGattCallBacks", "onDescriptorWrite:  FAIL - status $status")
-            onDescriptorWriteDeferred?.cancel(CancellationException("Gatt write descriptor operation failed -> gat code $status"))
+            onDescriptorWriteDeferred?.cancel(
+                CancellationException("Gatt write descriptor operation failed -> gat code $status")
+            )
         }
     }
 
@@ -153,19 +166,29 @@ internal class BleManagerGattCallBacks(private val bleNetworkMessageProcessor: B
 
     //region wait completions
     internal suspend fun waitForConnectionEstablished() = onConnectionEstablishedDeferred?.await()
-        ?: throw UninitializedPropertyAccessException("onConnectionEstablishedDeferred is null, you must call initConnectOperation() first")
+        ?: throw UninitializedPropertyAccessException(
+            "onConnectionEstablishedDeferred is null, you must call initConnectOperation() first"
+        )
 
     internal suspend fun waitForDataRead() = onDataReadDeferred?.await()
-        ?: throw UninitializedPropertyAccessException("onDataReadDeferred is null, you must call initReadOperation() first")
+        ?: throw UninitializedPropertyAccessException(
+            "onDataReadDeferred is null, you must call initReadOperation() first"
+        )
 
     internal suspend fun waitForWrittenDescriptor() = onDescriptorWriteDeferred?.await()
-        ?: throw UninitializedPropertyAccessException("onDescriptorWriteDeferred is null, you must call initWriteDescriptorOperation() first")
+        ?: throw UninitializedPropertyAccessException(
+            "onDescriptorWriteDeferred is null, you must call initWriteDescriptorOperation() first"
+        )
 
     internal suspend fun waitForDisconnected() = onDisconnectedDeferred?.await()
-        ?: throw UninitializedPropertyAccessException("onDisconnectedDeferred is null, you must call initDisconnectOperation() first")
+        ?: throw UninitializedPropertyAccessException(
+            "onDisconnectedDeferred is null, you must call initDisconnectOperation() first"
+        )
 
     internal suspend fun waitForServicesDiscovered() = onServicesDiscoveredDeferred?.await()
-        ?: throw UninitializedPropertyAccessException("onServicesDiscoveredDeferred is null, you must call initDiscoverServicesOperation() first")
+        ?: throw UninitializedPropertyAccessException(
+            "onServicesDiscoveredDeferred is null, you must call initDiscoverServicesOperation() first"
+        )
 
     //endregion
 }

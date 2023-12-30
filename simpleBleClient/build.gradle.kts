@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.klint)
+    alias(libs.plugins.detekt)
 }
 
 android {
@@ -37,6 +38,10 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+}
+
+detekt {
+    config.setFrom("detekt.yml")
 }
 
 dependencies {
