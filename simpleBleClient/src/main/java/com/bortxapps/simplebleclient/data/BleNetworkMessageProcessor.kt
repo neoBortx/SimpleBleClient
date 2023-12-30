@@ -3,7 +3,7 @@ package com.bortxapps.simplebleclient.data
 import android.util.Log
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class BleNetworkMessageProcessor {
+internal class BleNetworkMessageProcessor {
 
     private var packet = ubyteArrayOf()
     private var bytesRemaining = 0

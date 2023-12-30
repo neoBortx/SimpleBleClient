@@ -5,10 +5,10 @@ import com.bortxapps.simplebleclient.di.BleLibraryContainer
 import com.bortxapps.simplebleclient.manager.BleManager
 import com.bortxapps.simplebleclient.manager.contracts.SimpleBleClient
 
-object SimpleBleClientBuilder {
+public object SimpleBleClientBuilder {
     private var operationTimeOutMillis: Long? = null
-    fun setOperationTimeOutMillis(timeout: Long) = apply { operationTimeOutMillis = timeout }
-    fun build(context: Context): SimpleBleClient {
+    public fun setOperationTimeOutMillis(timeout: Long): SimpleBleClientBuilder = apply { operationTimeOutMillis = timeout }
+    public fun build(context: Context): SimpleBleClient {
         return buildInstance(context)
     }
 
