@@ -35,7 +35,7 @@ import org.junit.Before
 import org.junit.Test
 import java.util.UUID
 
-class BleManagerTest {
+internal class BleManagerTest {
 
     private val bleNetworkMessageProcessorMock = mockk<BleNetworkMessageProcessor>(relaxed = true)
     private val bluetoothDeviceMock = mockk<BluetoothDevice>(relaxed = true)
@@ -65,7 +65,7 @@ class BleManagerTest {
     private val value = ByteArray(1).toUByteArray()
 
     @OptIn(ExperimentalUnsignedTypes::class)
-    private val bleNetworkMessage = BleNetworkMessage(1, 1, value)
+    private val bleNetworkMessage = BleNetworkMessage(value)
 
     @OptIn(ExperimentalUnsignedTypes::class)
     @Before

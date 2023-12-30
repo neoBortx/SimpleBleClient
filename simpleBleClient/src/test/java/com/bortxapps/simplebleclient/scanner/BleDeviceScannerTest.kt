@@ -22,7 +22,7 @@ import org.junit.Before
 import org.junit.Test
 import java.util.UUID
 
-class BleDeviceScannerTest {
+internal class BleDeviceScannerTest {
 
     private val contextMock = mockk<Context>(relaxed = true)
     private val bluetoothDeviceMock = mockk<BluetoothDevice>(relaxed = true)

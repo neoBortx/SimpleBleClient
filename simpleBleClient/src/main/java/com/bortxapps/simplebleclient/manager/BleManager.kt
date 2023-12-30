@@ -3,10 +3,10 @@ package com.bortxapps.simplebleclient.manager
 import android.bluetooth.BluetoothGatt
 import android.content.Context
 import android.util.Log
+import com.bortxapps.simplebleclient.api.contracts.SimpleBleClient
 import com.bortxapps.simplebleclient.data.BleNetworkMessage
 import com.bortxapps.simplebleclient.exceptions.BleError
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
-import com.bortxapps.simplebleclient.manager.contracts.SimpleBleClient
 import com.bortxapps.simplebleclient.manager.utils.launchBleOperationWithValidations
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

@@ -7,7 +7,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-class BleNetworkMessageProcessorTest {
+internal class BleNetworkMessageProcessorTest {
 
     private lateinit var messageProcessor: BleNetworkMessageProcessor
 
@@ -28,8 +28,6 @@ class BleNetworkMessageProcessorTest {
         messageProcessor.processMessage(testData)
 
         val res = messageProcessor.getPacket()
-        assertEquals(id.toInt(), res.id)
-        assertEquals(status.toInt(), res.status)
         assertEquals(id, res.data[0])
         assertEquals(status, res.data[1])
         assertEquals(data[0], res.data[2])
@@ -64,8 +62,6 @@ class BleNetworkMessageProcessorTest {
         assertTrue(messageProcessor.isReceived())
         assertFalse(resContinuation.missingData)
 
-        assertEquals(id.toInt(), resContinuation.id)
-        assertEquals(status.toInt(), resContinuation.status)
         assertEquals(id, resContinuation.data[0])
         assertEquals(status, resContinuation.data[1])
         assertEquals(data[0], resContinuation.data[2])
@@ -89,8 +85,6 @@ class BleNetworkMessageProcessorTest {
         messageProcessor.processMessage(testData)
 
         val res = messageProcessor.getPacket()
-        assertEquals(id.toInt(), res.id)
-        assertEquals(status.toInt(), res.status)
         assertEquals(id, res.data[0])
         assertEquals(status, res.data[1])
         assertEquals(data[0], res.data[2])
@@ -114,8 +108,6 @@ class BleNetworkMessageProcessorTest {
         messageProcessor.processMessage(testData)
 
         val res = messageProcessor.getPacket()
-        assertEquals(id.toInt(), res.id)
-        assertEquals(status.toInt(), res.status)
         assertEquals(id, res.data[0])
         assertEquals(status, res.data[1])
         assertEquals(data[0], res.data[2])
@@ -142,8 +134,6 @@ class BleNetworkMessageProcessorTest {
         messageProcessor.processMessage(testData)
 
         val res = messageProcessor.getPacket()
-        assertEquals(id.toInt(), res.id)
-        assertEquals(status.toInt(), res.status)
         assertEquals(value[0], res.data[2])
         assertEquals(value[1], res.data[3])
     }
@@ -166,21 +156,8 @@ class BleNetworkMessageProcessorTest {
         messageProcessor.processMessage(testData)
 
         val res = messageProcessor.getPacket()
-        assertEquals(id.toInt(), res.id)
-        assertEquals(status.toInt(), res.status)
         assertEquals(value[0], res.data[2])
         assertEquals(value[1], res.data[3])
-    }
-
-    @Test
-    fun testProcessContinuationMessage() {
-        // Example of processing a continuation message
-        // Add your test logic here
-    }
-
-    @Test
-    fun testClearData() {
-        // Add test logic for clearData method
     }
 
     @OptIn(ExperimentalUnsignedTypes::class)

@@ -1,0 +1,46 @@
+package com.bortxapps.simplebleclient.api.contracts
+
+import android.bluetooth.BluetoothDevice
+import android.content.Context
+import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
+import kotlinx.coroutines.flow.Flow
+import java.util.UUID
+
+public interface SimpleBleClientDeviceSeeker {
+    /**
+     * TODO make another method to filter by prefix before release
+     * Retrieves a flow of BLE devices that offers a specified service. This operation has a timeout of 30 seconds.
+     * Launch inside a coroutine to avoid blocking the main thread.
+     *
+     * You can launch this operation just once at a time. If you need to launch it more than once, you need to wait
+     * for the previous one to finish or call [stopSearchDevices] to stop the previous one. If not a
+     * [SimpleBleClientException] will be thrown.
+     *
+     * @param serviceUUID The UUID of the BLE service to filter devices.
+     * @return A flow of [BluetoothDevice] instances that offer the specified service.
+     *
+     * @throws SimpleBleClientException Thrown when an error occurs during the BLE operation.
+     *
+     */
+    public suspend fun getDevicesByService(serviceUUID: UUID): Flow<BluetoothDevice>
+
+    /**
+     * TODO erase before release or make generic
+     *
+     * Retrieves a list of BLE devices that are already paired to the device and whose name starts with the specified
+     * prefix.
+     *
+     * @return A flow of [BluetoothDevice] instances that offer the specified service.
+     *
+     * @throws SimpleBleClientException Thrown when an error occurs during the BLE operation.
+     */
+
+    public suspend fun getPairedDevicesByPrefix(context: Context, deviceNamePrefix: String): List<BluetoothDevice>
+
+    /**
+     * Stops the ongoing search for BLE devices.
+     *
+     * @throws SimpleBleClientException Thrown when an error occurs during the BLE operation.
+     */
+    public suspend fun stopSearchDevices()
+}

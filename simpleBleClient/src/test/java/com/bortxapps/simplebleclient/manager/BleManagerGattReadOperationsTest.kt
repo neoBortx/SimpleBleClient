@@ -25,7 +25,7 @@ import org.junit.Before
 import org.junit.Test
 import java.util.UUID
 
-class BleManagerGattReadOperationsTest {
+internal class BleManagerGattReadOperationsTest {
 
     private val bluetoothGattMock: BluetoothGatt by lazy { mockk<BluetoothGatt>(relaxed = true) }
     private val bluetoothCharacteristicMock = mockk<BluetoothGattCharacteristic>(relaxed = true)
@@ -46,7 +46,7 @@ class BleManagerGattReadOperationsTest {
     private val value = ByteArray(1).toUByteArray()
 
     @OptIn(ExperimentalUnsignedTypes::class)
-    private val bleNetworkMessage = BleNetworkMessage(1, 1, value)
+    private val bleNetworkMessage = BleNetworkMessage(value)
 
     @OptIn(ExperimentalUnsignedTypes::class)
     @Before
