@@ -38,8 +38,8 @@ internal class BleManager(
     }
 
     //region search devices
-    override suspend fun getDevicesByService(serviceUUID: UUID) = launchBleOperationWithValidations(context) {
-        bleManagerDeviceConnection.getDevicesByService(serviceUUID)
+    override suspend fun getDevicesNearby(serviceUUID: UUID?, deviceName: String?) = launchBleOperationWithValidations(context) {
+        bleManagerDeviceConnection.getDevicesByService(serviceUUID, deviceName)
     }
 
     override suspend fun getPairedDevicesByPrefix(context: Context, deviceNamePrefix: String) =

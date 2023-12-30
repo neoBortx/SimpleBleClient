@@ -22,8 +22,11 @@ import kotlinx.coroutines.sync.Mutex
 
 internal class BleLibraryContainer(context: Context) {
     // ble
-    private val blueToothScanner = ContextCompat.getSystemService(context.applicationContext, BluetoothManager::class.java)?.adapter?.bluetoothLeScanner
-        ?: throw SimpleBleClientException(BleError.UNABLE_INITIALIZE_CONTROLLER)
+    private val blueToothScanner =
+        ContextCompat.getSystemService(context.applicationContext, BluetoothManager::class.java)?.adapter?.bluetoothLeScanner
+            ?: throw SimpleBleClientException(BleError.UNABLE_INITIALIZE_CONTROLLER)
+
+    val bleConfiguration = BleConfiguration()
 
     private val bleDeviceScannerFilterBuilder = BleDeviceScannerFilterBuilder()
     private val bleDeviceScannerSettingsBuilder = BleDeviceScannerSettingsBuilder()
@@ -32,14 +35,14 @@ internal class BleLibraryContainer(context: Context) {
         blueToothScanner,
         bleDeviceScannerSettingsBuilder,
         bleDeviceScannerFilterBuilder,
-        bleDeviceScannerCallbackBuilder
+        bleDeviceScannerCallbackBuilder,
+        bleConfiguration
     )
 
     private val bleNetworkMessageProcessor = BleNetworkMessageProcessor()
     private val gattMutex = Mutex()
     private val buildVersionProvider = BuildVersionProvider()
 
-    val bleConfiguration = BleConfiguration()
     val bleManagerGattCallBacks = BleManagerGattCallBacks(bleNetworkMessageProcessor)
     val bleManagerDeviceSearchOperations = BleManagerDeviceSearchOperations(bleDeviceScannerManager)
     val bleManagerGattConnectionOperations =

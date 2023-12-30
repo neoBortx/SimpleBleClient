@@ -6,6 +6,7 @@ import android.bluetooth.le.BluetoothLeScanner
 import android.util.Log
 import com.bortxapps.simplebleclient.exceptions.BleError
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
+import com.bortxapps.simplebleclient.manager.BleConfiguration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
@@ -20,12 +21,9 @@ internal class BleDeviceScannerManager(
     private val scanner: BluetoothLeScanner,
     private val bleDeviceScannerSettingsBuilder: BleDeviceScannerSettingsBuilder,
     private val bleDeviceScannerFilterBuilder: BleDeviceScannerFilterBuilder,
-    private val bleDeviceScannerCallbackBuilder: BleDeviceScannerCallbackBuilder
+    private val bleDeviceScannerCallbackBuilder: BleDeviceScannerCallbackBuilder,
+    private val bleConfiguration: BleConfiguration
 ) {
-
-    companion object {
-        private const val SCAN_PERIOD: Long = 10000
-    }
 
     private var bleScannerTimerHandler: Timer? = null
     private var onStopSearch: () -> Unit = {}
@@ -36,7 +34,7 @@ internal class BleDeviceScannerManager(
         }
 
     @SuppressLint("MissingPermission")
-    fun scanBleDevicesNearby(serviceUuid: UUID, scanPeriod: Long = SCAN_PERIOD): Flow<BluetoothDevice> = callbackFlow {
+    fun scanBleDevicesNearby(serviceUuid: UUID?, deviceName: String?): Flow<BluetoothDevice> = callbackFlow {
         onStopSearch = {
             Log.d("BleManager", "stopSearchObserver")
             close()
@@ -50,7 +48,7 @@ internal class BleDeviceScannerManager(
 
         try {
             scanner.startScan(
-                bleDeviceScannerFilterBuilder.buildFilters(serviceUuid),
+                bleDeviceScannerFilterBuilder.buildFilters(serviceUuid, deviceName),
                 bleDeviceScannerSettingsBuilder.buildScanSettings(),
                 leScanCallback
             )
@@ -60,7 +58,7 @@ internal class BleDeviceScannerManager(
         }
 
         bleScannerTimerHandler = Timer().also {
-            it.schedule(scanPeriod) {
+            it.schedule(bleConfiguration.scanPeriodMillis) {
                 Log.d("BleManager", "Discovering time expired")
                 close()
             }

@@ -115,14 +115,14 @@ internal class BleManagerTest {
         }
     }
 
-    //region getPairedDevicesByPrefix
+    //region getDevicesByService
     @Test
     fun `getDevicesByServiceShould call BleManagerDeviceSearchOperations getDevicesByService`() = runTest {
-        coEvery { bleManagerDeviceConnectionMock.getDevicesByService(serviceUUID) } returns flow { emit(bluetoothDeviceMock) }
+        coEvery { bleManagerDeviceConnectionMock.getDevicesByService(serviceUUID, null) } returns flow { emit(bluetoothDeviceMock) }
 
-        bleManager.getDevicesByService(serviceUUID)
+        bleManager.getDevicesNearby(serviceUUID)
 
-        verify { bleManagerDeviceConnectionMock.getDevicesByService(serviceUUID) }
+        verify { bleManagerDeviceConnectionMock.getDevicesByService(serviceUUID, null) }
     }
 
     @Test
