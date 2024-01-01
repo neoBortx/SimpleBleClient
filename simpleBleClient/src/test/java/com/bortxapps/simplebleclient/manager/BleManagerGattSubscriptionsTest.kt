@@ -9,12 +9,15 @@ import android.bluetooth.BluetoothStatusCodes
 import android.os.Build
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
 import com.bortxapps.simplebleclient.manager.utils.BleNetworkMessageProcessorDefaultImpl
+import com.bortxapps.simplebleclient.manager.utils.getEnableIndicationValue
+import com.bortxapps.simplebleclient.manager.utils.getEnableNotificationValue
 import com.bortxapps.simplebleclient.providers.BleMessageProcessorProvider
 import com.bortxapps.simplebleclient.providers.BuildVersionProvider
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import io.mockk.slot
 import io.mockk.spyk
 import io.mockk.verify
@@ -61,6 +64,8 @@ internal class BleManagerGattSubscriptionsTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
+        mockkStatic(::getEnableIndicationValue)
+        mockkStatic(::getEnableNotificationValue)
         mutex = Mutex()
         bleNetworkMessageProcessor = BleNetworkMessageProcessorDefaultImpl()
         bleConfiguration = BleConfiguration().apply {
@@ -80,8 +85,8 @@ internal class BleManagerGattSubscriptionsTest {
         every { bluetoothDeviceMock.name } returns goProName
         every { bluetoothDeviceMock.address } returns goProAddress
         every { bluetoothDeviceMock2.name } returns "Xiaomi123456"
-        every { bleManagerGattSubscriptions invokeNoArgs "getEnableIndicationValue" } returns enableIndicationValue
-        every { bleManagerGattSubscriptions invokeNoArgs "getEnableNotificationValue" } returns enableNotificationValue
+        every { getEnableIndicationValue() } returns enableIndicationValue
+        every { getEnableNotificationValue() } returns enableNotificationValue
 
         every { bluetoothDeviceMock.connectGatt(any(), any(), capture(callbackSlot)) } answers {
             bluetoothGattMock
@@ -319,5 +324,11 @@ internal class BleManagerGattSubscriptionsTest {
                 bleManagerGattSubscriptions.subscribeToNotifications(bluetoothGattMock, characteristics)
             }
         }
+    }
+
+    @Test
+    fun `subscribeToIncomeMessages should call to subscribeToIncomeMessages from bleManagerGattCallBacks`() = runTest {
+        bleManagerGattSubscriptions.subscribeToIncomeMessages()
+        verify { bleManagerGattCallBacks.subscribeToIncomeMessages() }
     }
 }
