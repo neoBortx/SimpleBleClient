@@ -1,5 +1,7 @@
 package com.bortxapps.simplebleclient.manager
 
+import com.bortxapps.simplebleclient.api.contracts.BleNetworkMessageProcessor
+
 internal class BleConfiguration {
     companion object {
         private const val OPERATION_TIME_OUT: Long = 7000
@@ -8,4 +10,5 @@ internal class BleConfiguration {
 
     var operationTimeoutMillis: Long = OPERATION_TIME_OUT
     var scanPeriodMillis: Long = SCAN_PERIOD
+    var messageProcessor: BleNetworkMessageProcessor? = null
 }

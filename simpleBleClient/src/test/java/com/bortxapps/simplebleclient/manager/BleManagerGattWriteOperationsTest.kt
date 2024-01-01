@@ -6,9 +6,10 @@ import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothStatusCodes
 import android.os.Build
-import com.bortxapps.simplebleclient.data.BleNetworkMessage
-import com.bortxapps.simplebleclient.data.BleNetworkMessageProcessor
+import com.bortxapps.simplebleclient.api.data.BleNetworkMessage
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
+import com.bortxapps.simplebleclient.manager.utils.BleNetworkMessageProcessorDefaultImpl
+import com.bortxapps.simplebleclient.providers.BleMessageProcessorProvider
 import com.bortxapps.simplebleclient.providers.BuildVersionProvider
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -31,7 +32,6 @@ import java.util.UUID
 
 internal class BleManagerGattWriteOperationsTest {
 
-    private val bleNetworkMessageProcessorMock = mockk<BleNetworkMessageProcessor>(relaxed = true)
     private val bluetoothDeviceMock = mockk<BluetoothDevice>(relaxed = true)
     private val bluetoothDeviceMock2 = mockk<BluetoothDevice>(relaxed = true)
 
@@ -39,9 +39,11 @@ internal class BleManagerGattWriteOperationsTest {
     private val bluetoothCharacteristicMock = mockk<BluetoothGattCharacteristic>(relaxed = true)
     private val buildVersionProviderMock = mockk<BuildVersionProvider>(relaxed = true)
 
+    private lateinit var bleNetworkMessageProcessor: BleNetworkMessageProcessorDefaultImpl
     private lateinit var bleManagerGattWriteOperations: BleManagerGattWriteOperations
     private lateinit var bleManagerGattCallBacks: BleManagerGattCallBacks
     private lateinit var bleConfiguration: BleConfiguration
+    private lateinit var bleMessageProcessorProvider: BleMessageProcessorProvider
     private lateinit var mutex: Mutex
     private val serviceUUID = UUID.randomUUID()
     private val characteristicUUID = UUID.randomUUID()
@@ -49,21 +51,22 @@ internal class BleManagerGattWriteOperationsTest {
     private val goProAddress = "568676970987986"
     private val callbackSlot = slot<BluetoothGattCallback>()
 
-    @OptIn(ExperimentalUnsignedTypes::class)
-    private val value = ByteArray(1).toUByteArray()
+    private val value = ByteArray(1)
 
-    @OptIn(ExperimentalUnsignedTypes::class)
-    private val bleNetworkMessage = BleNetworkMessage(value)
+    private val bleNetworkMessage = BleNetworkMessage(characteristicUUID, value)
 
-    @OptIn(ExperimentalUnsignedTypes::class)
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
+        mutex = Mutex()
+        bleNetworkMessageProcessor = spyk(BleNetworkMessageProcessorDefaultImpl())
         bleConfiguration = BleConfiguration().apply {
             operationTimeoutMillis = 20
+            messageProcessor = bleNetworkMessageProcessor
         }
-        mutex = Mutex()
-        bleManagerGattCallBacks = spyk(BleManagerGattCallBacks(bleNetworkMessageProcessorMock))
+        bleMessageProcessorProvider = BleMessageProcessorProvider(bleConfiguration)
+
+        bleManagerGattCallBacks = spyk(BleManagerGattCallBacks(bleMessageProcessorProvider))
         bleManagerGattWriteOperations = spyk(
             BleManagerGattWriteOperations(
                 bleManagerGattCallBacks,
@@ -77,10 +80,9 @@ internal class BleManagerGattWriteOperationsTest {
         every { bluetoothDeviceMock2.name } returns "Xiaomi123456"
 
         every { bluetoothGattMock.getService(serviceUUID)?.getCharacteristic(characteristicUUID) } returns bluetoothCharacteristicMock
-        every { bleNetworkMessageProcessorMock.processMessage(value) } just runs
-        every { bleNetworkMessageProcessorMock.processSimpleMessage(value) } just runs
-        every { bleNetworkMessageProcessorMock.isReceived() } returns true
-        every { bleNetworkMessageProcessorMock.getPacket() } returns bleNetworkMessage
+        every { bleNetworkMessageProcessor.processMessage(characteristicUUID, value) } just runs
+        every { bleNetworkMessageProcessor.isFullyReceived() } returns true
+        every { bleNetworkMessageProcessor.getPacket() } returns bleNetworkMessage
 
         every { bluetoothDeviceMock.connectGatt(any(), any(), capture(callbackSlot)) } answers {
             bluetoothGattMock
@@ -102,7 +104,7 @@ internal class BleManagerGattWriteOperationsTest {
     fun testSendData_GattNotInitialized_expectException() = runTest {
         Assert.assertThrows(SimpleBleClientException::class.java) {
             runBlocking {
-                bleManagerGattWriteOperations.sendData(serviceUUID, characteristicUUID, ByteArray(1), bluetoothGattMock, false)
+                bleManagerGattWriteOperations.sendData(serviceUUID, characteristicUUID, ByteArray(1), bluetoothGattMock)
             }
         }
     }
@@ -119,7 +121,7 @@ internal class BleManagerGattWriteOperationsTest {
 
         TestCase.assertEquals(
             bleNetworkMessage,
-            bleManagerGattWriteOperations.sendData(serviceUUID, characteristicUUID, value, bluetoothGattMock, false)
+            bleManagerGattWriteOperations.sendData(serviceUUID, characteristicUUID, value, bluetoothGattMock)
         )
     }
 
@@ -135,10 +137,10 @@ internal class BleManagerGattWriteOperationsTest {
 
         TestCase.assertEquals(
             bleNetworkMessage,
-            bleManagerGattWriteOperations.sendData(serviceUUID, characteristicUUID, value, bluetoothGattMock, true)
+            bleManagerGattWriteOperations.sendData(serviceUUID, characteristicUUID, value, bluetoothGattMock)
         )
 
-        verify { bleManagerGattCallBacks.initReadOperation(true) }
+        verify { bleManagerGattCallBacks.initDeferredReadOperation() }
     }
 
     @Test
@@ -159,7 +161,7 @@ internal class BleManagerGattWriteOperationsTest {
 
         TestCase.assertEquals(
             bleNetworkMessage,
-            bleManagerGattWriteOperations.sendData(serviceUUID, characteristicUUID, value, bluetoothGattMock, false)
+            bleManagerGattWriteOperations.sendData(serviceUUID, characteristicUUID, value, bluetoothGattMock)
         )
     }
 
@@ -175,7 +177,7 @@ internal class BleManagerGattWriteOperationsTest {
 
         Assert.assertThrows(SimpleBleClientException::class.java) {
             runBlocking {
-                bleManagerGattWriteOperations.sendData(serviceUUID, characteristicUUID, value, bluetoothGattMock, false)
+                bleManagerGattWriteOperations.sendData(serviceUUID, characteristicUUID, value, bluetoothGattMock)
             }
         }
     }
@@ -197,7 +199,7 @@ internal class BleManagerGattWriteOperationsTest {
 
         Assert.assertThrows(SimpleBleClientException::class.java) {
             runBlocking {
-                bleManagerGattWriteOperations.sendData(serviceUUID, characteristicUUID, value, bluetoothGattMock, false)
+                bleManagerGattWriteOperations.sendData(serviceUUID, characteristicUUID, value, bluetoothGattMock)
             }
         }
     }
@@ -213,7 +215,7 @@ internal class BleManagerGattWriteOperationsTest {
 
         Assert.assertThrows(SimpleBleClientException::class.java) {
             runBlocking {
-                bleManagerGattWriteOperations.sendData(serviceUUID, characteristicUUID, value, bluetoothGattMock, false)
+                bleManagerGattWriteOperations.sendData(serviceUUID, characteristicUUID, value, bluetoothGattMock)
             }
         }
     }
@@ -232,7 +234,7 @@ internal class BleManagerGattWriteOperationsTest {
 
         Assert.assertThrows(SimpleBleClientException::class.java) {
             runBlocking {
-                bleManagerGattWriteOperations.sendData(serviceUUID, characteristicUUID, value, bluetoothGattMock, false)
+                bleManagerGattWriteOperations.sendData(serviceUUID, characteristicUUID, value, bluetoothGattMock)
             }
         }
     }
@@ -245,7 +247,7 @@ internal class BleManagerGattWriteOperationsTest {
 
         Assert.assertThrows(SimpleBleClientException::class.java) {
             runBlocking {
-                bleManagerGattWriteOperations.sendData(serviceUUID, characteristicUUID, value, bluetoothGattMock, false)
+                bleManagerGattWriteOperations.sendData(serviceUUID, characteristicUUID, value, bluetoothGattMock)
             }
         }
     }
@@ -259,7 +261,7 @@ internal class BleManagerGattWriteOperationsTest {
 
         Assert.assertThrows(SimpleBleClientException::class.java) {
             runBlocking {
-                bleManagerGattWriteOperations.sendData(serviceUUID, characteristicUUID, value, bluetoothGattMock, false)
+                bleManagerGattWriteOperations.sendData(serviceUUID, characteristicUUID, value, bluetoothGattMock)
             }
         }
     }

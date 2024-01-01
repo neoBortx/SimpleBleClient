@@ -7,8 +7,9 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothStatusCodes
 import android.os.Build
-import com.bortxapps.simplebleclient.data.BleNetworkMessageProcessor
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
+import com.bortxapps.simplebleclient.manager.utils.BleNetworkMessageProcessorDefaultImpl
+import com.bortxapps.simplebleclient.providers.BleMessageProcessorProvider
 import com.bortxapps.simplebleclient.providers.BuildVersionProvider
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -28,7 +29,7 @@ import java.util.UUID
 
 internal class BleManagerGattSubscriptionsTest {
 
-    private val bleNetworkMessageProcessorMock = mockk<BleNetworkMessageProcessor>(relaxed = true)
+
     private val bluetoothDeviceMock = mockk<BluetoothDevice>(relaxed = true)
     private val bluetoothDeviceMock2 = mockk<BluetoothDevice>(relaxed = true)
 
@@ -40,9 +41,11 @@ internal class BleManagerGattSubscriptionsTest {
 
     private val bleManagerDeviceConnectionMock = mockk<BleManagerDeviceSearchOperations>(relaxed = true)
 
+    private lateinit var bleNetworkMessageProcessor: BleNetworkMessageProcessorDefaultImpl
     private lateinit var bleManagerGattSubscriptions: BleManagerGattSubscriptions
     private lateinit var bleManagerGattCallBacks: BleManagerGattCallBacks
     private lateinit var bleConfiguration: BleConfiguration
+    private lateinit var bleMessageProcessorProvider: BleMessageProcessorProvider
     private lateinit var mutex: Mutex
     private val goProName = "GoPro123456"
     private val goProAddress = "568676970987986"
@@ -59,10 +62,13 @@ internal class BleManagerGattSubscriptionsTest {
     fun setUp() {
         MockKAnnotations.init(this)
         mutex = Mutex()
+        bleNetworkMessageProcessor = BleNetworkMessageProcessorDefaultImpl()
         bleConfiguration = BleConfiguration().apply {
             operationTimeoutMillis = 20
+            messageProcessor = bleNetworkMessageProcessor
         }
-        bleManagerGattCallBacks = spyk(BleManagerGattCallBacks(bleNetworkMessageProcessorMock))
+        bleMessageProcessorProvider = BleMessageProcessorProvider(bleConfiguration)
+        bleManagerGattCallBacks = spyk(BleManagerGattCallBacks(bleMessageProcessorProvider))
         bleManagerGattSubscriptions = spyk(
             BleManagerGattSubscriptions(
                 bleManagerGattCallBacks,

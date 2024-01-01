@@ -2,6 +2,7 @@ package com.bortxapps.simplebleclient.api
 
 import android.content.Context
 import com.bortxapps.simplebleclient.api.SimpleBleClientBuilder.operationTimeOutMillis
+import com.bortxapps.simplebleclient.api.contracts.BleNetworkMessageProcessor
 import com.bortxapps.simplebleclient.api.contracts.SimpleBleClient
 import com.bortxapps.simplebleclient.di.BleLibraryContainer
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
@@ -33,9 +34,16 @@ import com.bortxapps.simplebleclient.manager.BleManager
 public object SimpleBleClientBuilder {
     private var operationTimeOutMillis: Long? = null
     private var scanPeriodMillis: Long? = null
-    public fun setOperationTimeOutMillis(timeout: Long): SimpleBleClientBuilder = apply { operationTimeOutMillis = timeout }
+    private var messageProcessor: BleNetworkMessageProcessor? = null
+    public fun setOperationTimeOutMillis(timeout: Long): SimpleBleClientBuilder =
+        apply { operationTimeOutMillis = timeout }
 
-    public fun setScanPeriodMillis(timeout: Long): SimpleBleClientBuilder = apply { scanPeriodMillis = timeout }
+    public fun setScanPeriodMillis(timeout: Long): SimpleBleClientBuilder =
+        apply { scanPeriodMillis = timeout }
+
+    public fun setMessageProcessor(messageProcessor: BleNetworkMessageProcessor): SimpleBleClientBuilder =
+        apply { this.messageProcessor = messageProcessor }
+
     public fun build(context: Context): SimpleBleClient {
         return buildInstance(context)
     }
@@ -44,6 +52,8 @@ public object SimpleBleClientBuilder {
         val container = BleLibraryContainer(context)
         operationTimeOutMillis?.let { container.bleConfiguration.operationTimeoutMillis = it }
         scanPeriodMillis?.let { container.bleConfiguration.scanPeriodMillis = it }
+        messageProcessor?.let { container.bleConfiguration.messageProcessor = it }
+
         return BleManager(
             container.bleManagerDeviceSearchOperations,
             container.bleManagerGattConnectionOperations,

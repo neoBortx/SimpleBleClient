@@ -1,6 +1,6 @@
 package com.bortxapps.simplebleclient.api.contracts
 
-import com.bortxapps.simplebleclient.data.BleNetworkMessage
+import com.bortxapps.simplebleclient.api.data.BleNetworkMessage
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
 import java.util.UUID
 
@@ -14,8 +14,6 @@ public interface SimpleBleClientWriter {
      * @param serviceUUID The UUID of the BLE service for the data transmission.
      * @param characteristicUUID The UUID of the BLE characteristic where data is written.
      * @param data The byte array data to send to the BLE device.
-     * @param complexResponse Indicates if the response from the BLE device
-     *                        is expected to be complex. Default is `false`.
      *
      * @return [BleNetworkMessage] representing the result of the write operation.
      *
@@ -35,6 +33,5 @@ public interface SimpleBleClientWriter {
         serviceUUID: UUID,
         characteristicUUID: UUID,
         data: ByteArray,
-        complexResponse: Boolean = false
     ): BleNetworkMessage
 }

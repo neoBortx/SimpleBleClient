@@ -3,15 +3,18 @@ package com.bortxapps.simplebleclient.manager
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
-import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothStatusCodes
 import android.os.Build
 import android.util.Log
+import com.bortxapps.simplebleclient.api.data.BleNetworkMessage
 import com.bortxapps.simplebleclient.exceptions.BleError
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
 import com.bortxapps.simplebleclient.manager.utils.BleManagerGattOperationBase
+import com.bortxapps.simplebleclient.manager.utils.getEnableIndicationValue
+import com.bortxapps.simplebleclient.manager.utils.getEnableNotificationValue
 import com.bortxapps.simplebleclient.providers.BuildVersionProvider
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import java.util.UUID
@@ -27,11 +30,11 @@ internal class BleManagerGattSubscriptions(
         private const val BLE_DESCRIPTION_BASE_UUID = "00002902-0000-1000-8000-00805F9B34FB"
     }
 
-    suspend fun subscribeToNotifications(bluetoothGatt: BluetoothGatt, characteristicsUUid: List<UUID>) {
+    suspend fun subscribeToNotifications(bluetoothGatt: BluetoothGatt, characteristicsUUid: List<UUID>): SharedFlow<BleNetworkMessage> {
         getNotifiableCharacteristics(bluetoothGatt, characteristicsUUid).forEach { characteristic ->
             withContext(IO) {
                 launchGattOperation {
-                    bleManagerGattCallBacks.initWriteDescriptorOperation()
+                    bleManagerGattCallBacks.initDeferredWriteDescriptorOperation()
                     if (writeDescriptor(characteristic, getDescriptionValueToSubscribe(characteristic), bluetoothGatt)) {
                         launchDeferredOperation {
                             bleManagerGattCallBacks.waitForWrittenDescriptor()
@@ -42,7 +45,11 @@ internal class BleManagerGattSubscriptions(
                 }
             }
         }
+
+        return bleManagerGattCallBacks.subscribeToIncomeMessages()
     }
+
+    fun subscribeToIncomeMessages(): SharedFlow<BleNetworkMessage> = bleManagerGattCallBacks.subscribeToIncomeMessages()
 
     private fun getNotifiableCharacteristics(bluetoothGatt: BluetoothGatt, characteristicsUUid: List<UUID>): List<BluetoothGattCharacteristic> =
         bluetoothGatt.services
@@ -70,12 +77,12 @@ internal class BleManagerGattSubscriptions(
         }
 
     private fun filterCharacteristicForSubscriptions(properties: Int) =
-        filterNotifiableCharacteristic(properties) || filterIndicatableCharacteristic(properties)
+        filterNotifiableCharacteristic(properties) || filterIndictableCharacteristic(properties)
 
     private fun filterNotifiableCharacteristic(properties: Int) =
         properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0
 
-    private fun filterIndicatableCharacteristic(properties: Int) =
+    private fun filterIndictableCharacteristic(properties: Int) =
         properties and BluetoothGattCharacteristic.PROPERTY_INDICATE != 0
 
     private fun filterResponseCharacteristic(characteristic: BluetoothGattCharacteristic, characteristicsUUid: List<UUID>): Boolean {
@@ -83,13 +90,10 @@ internal class BleManagerGattSubscriptions(
     }
 
     private fun getDescriptionValueToSubscribe(characteristic: BluetoothGattCharacteristic): ByteArray {
-        return if (filterIndicatableCharacteristic(characteristic.properties)) {
+        return if (filterIndictableCharacteristic(characteristic.properties)) {
             getEnableIndicationValue()
         } else {
             getEnableNotificationValue()
         }
     }
-
-    private fun getEnableIndicationValue() = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
-    private fun getEnableNotificationValue() = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
 }

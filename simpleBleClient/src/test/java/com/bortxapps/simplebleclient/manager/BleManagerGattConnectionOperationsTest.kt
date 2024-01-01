@@ -6,8 +6,8 @@ import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothProfile
 import android.content.Context
-import com.bortxapps.simplebleclient.data.BleNetworkMessageProcessor
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
+import com.bortxapps.simplebleclient.providers.BleMessageProcessorProvider
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -32,13 +32,13 @@ internal class BleManagerGattConnectionOperationsTest {
     private val bluetoothDeviceMock = mockk<BluetoothDevice>(relaxed = true)
     private val bluetoothGattMock: BluetoothGatt by lazy { mockk<BluetoothGatt>(relaxed = true) }
     private val bluetoothCharacteristicMock = mockk<BluetoothGattCharacteristic>(relaxed = true)
-    private val bleNetworkMessageProcessorMock = mockk<BleNetworkMessageProcessor>(relaxed = true)
 
     private val bleManagerDeviceConnectionMock = mockk<BleManagerDeviceSearchOperations>(relaxed = true)
 
     private lateinit var bleManagerGattConnectionOperations: BleManagerGattConnectionOperations
     private lateinit var bleManagerGattCallBacks: BleManagerGattCallBacks
     private lateinit var bleConfiguration: BleConfiguration
+    private lateinit var bleMessageProcessorProvider: BleMessageProcessorProvider
     private lateinit var mutex: Mutex
     private val callbackSlot = slot<BluetoothGattCallback>()
     private val serviceUUID = UUID.randomUUID()
@@ -53,7 +53,8 @@ internal class BleManagerGattConnectionOperationsTest {
         bleConfiguration = BleConfiguration().apply {
             operationTimeoutMillis = 20
         }
-        bleManagerGattCallBacks = spyk(BleManagerGattCallBacks(bleNetworkMessageProcessorMock))
+        bleMessageProcessorProvider = BleMessageProcessorProvider(bleConfiguration)
+        bleManagerGattCallBacks = spyk(BleManagerGattCallBacks(bleMessageProcessorProvider))
         bleManagerGattConnectionOperations =
             spyk(BleManagerGattConnectionOperations(bleManagerDeviceConnectionMock, bleManagerGattCallBacks, mutex, bleConfiguration))
 
