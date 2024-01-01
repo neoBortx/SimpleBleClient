@@ -3,7 +3,6 @@ package com.bortxapps.simplebleclient.api.contracts
 import android.content.Context
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
 import kotlinx.coroutines.flow.MutableStateFlow
-import java.util.UUID
 
 public interface SimpleBleClientConnection {
 
@@ -36,16 +35,4 @@ public interface SimpleBleClientConnection {
      */
 
     public fun subscribeToConnectionStatusChanges(): MutableStateFlow<Int>
-
-    /**
-     * Subscribes to changes of specified BLE characteristics.
-     *
-     * @param characteristicsUUid A list of UUIDs for the characteristics to monitor. If the list is empty,
-     *                           all characteristics Noticeable and Indictable will be monitored.
-     * @return A Boolean indicating the success or failure of the subscription.
-     *
-     * @throws SimpleBleClientException Thrown when an error occurs during the BLE operation.
-     */
-
-    public suspend fun subscribeToCharacteristicChanges(characteristicsUUid: List<UUID>): Boolean
 }

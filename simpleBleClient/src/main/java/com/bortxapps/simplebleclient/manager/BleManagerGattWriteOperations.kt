@@ -6,7 +6,7 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothStatusCodes
 import android.os.Build
 import android.util.Log
-import com.bortxapps.simplebleclient.data.BleNetworkMessage
+import com.bortxapps.simplebleclient.api.data.BleNetworkMessage
 import com.bortxapps.simplebleclient.exceptions.BleError
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
 import com.bortxapps.simplebleclient.manager.utils.BleManagerGattOperationBase
@@ -27,14 +27,12 @@ internal class BleManagerGattWriteOperations(
         characteristicUUID: UUID,
         data: ByteArray,
         bluetoothGatt: BluetoothGatt,
-        complexResponse: Boolean
     ): BleNetworkMessage {
         bluetoothGatt.getService(serviceUUID)?.getCharacteristic(characteristicUUID)?.let {
             return writeCharacteristic(
                 bluetoothGatt,
                 data,
-                it,
-                complexResponse
+                it
             )
         } ?: run {
             Log.e("BleManager", "writeCharacteristic characteristic is null")
@@ -48,10 +46,9 @@ internal class BleManagerGattWriteOperations(
         bluetoothGatt: BluetoothGatt,
         value: ByteArray,
         characteristic: BluetoothGattCharacteristic,
-        complexResponse: Boolean
     ): BleNetworkMessage {
         return launchGattOperation {
-            bleManagerGattCallBacks.initReadOperation(complexResponse)
+            bleManagerGattCallBacks.initDeferredReadOperation()
             val res = if (buildVersionProvider.getSdkVersion() >= Build.VERSION_CODES.TIRAMISU) {
                 bluetoothGatt.writeCharacteristic(
                     characteristic,

@@ -6,15 +6,16 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothProfile
 import android.util.Log
-import com.bortxapps.simplebleclient.data.BleNetworkMessage
-import com.bortxapps.simplebleclient.data.BleNetworkMessageProcessor
+import com.bortxapps.simplebleclient.api.contracts.BleNetworkMessageProcessor
+import com.bortxapps.simplebleclient.api.data.BleNetworkMessage
+import com.bortxapps.simplebleclient.providers.BleMessageProcessorProvider
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import java.util.UUID
 import java.util.concurrent.CancellationException
 
-@OptIn(ExperimentalUnsignedTypes::class)
-internal class BleManagerGattCallBacks(private val bleNetworkMessageProcessor: BleNetworkMessageProcessor) :
-    BluetoothGattCallback() {
+internal class BleManagerGattCallBacks(bleMessageProcessorProvider: BleMessageProcessorProvider) : BluetoothGattCallback() {
 
     //region completions
     private var onConnectionEstablishedDeferred: CompletableDeferred<Boolean>? = null
@@ -25,8 +26,9 @@ internal class BleManagerGattCallBacks(private val bleNetworkMessageProcessor: B
     //endregion
 
     private var connectionStatus: MutableStateFlow<Int> = MutableStateFlow(BluetoothProfile.STATE_DISCONNECTED)
+    private var incomeMessages: MutableSharedFlow<BleNetworkMessage> = MutableSharedFlow()
 
-    private var readComplexResponse: Boolean = false
+    private var bleMessageProcessor: BleNetworkMessageProcessor = bleMessageProcessorProvider.getMessageProcessor()
 
     override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
         if (status == BluetoothGatt.GATT_SUCCESS) {
@@ -76,10 +78,10 @@ internal class BleManagerGattCallBacks(private val bleNetworkMessageProcessor: B
         status: Int
     ) {
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            processCharacteristic(value.toUByteArray())
+            processCharacteristic(characteristic.uuid, value)
         } else {
             Log.e("BleManagerGattCallBacks", "onCharacteristicRead: ${characteristic.uuid} FAIL - status $status")
-            bleNetworkMessageProcessor.clearData()
+            bleMessageProcessor.clearData()
             onDataReadDeferred?.cancel(CancellationException("Gatt Read operation failed -> gat code $status"))
         }
     }
@@ -89,7 +91,7 @@ internal class BleManagerGattCallBacks(private val bleNetworkMessageProcessor: B
         characteristic: BluetoothGattCharacteristic,
         value: ByteArray
     ) {
-        processCharacteristic(value.toUByteArray())
+        processCharacteristic(characteristic.uuid, value)
     }
 
     override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
@@ -114,15 +116,13 @@ internal class BleManagerGattCallBacks(private val bleNetworkMessageProcessor: B
         }
     }
 
-    @OptIn(ExperimentalUnsignedTypes::class)
-    private fun processCharacteristic(value: UByteArray) {
-        if (readComplexResponse) {
-            bleNetworkMessageProcessor.processMessage(value)
-        } else {
-            bleNetworkMessageProcessor.processSimpleMessage(value)
-        }
-        if (bleNetworkMessageProcessor.isReceived()) {
-            onDataReadDeferred?.complete(bleNetworkMessageProcessor.getPacket())
+    private fun processCharacteristic(uuid: UUID, value: ByteArray) {
+
+        incomeMessages.tryEmit(BleNetworkMessage(uuid, value))
+
+        bleMessageProcessor.processMessage(uuid, value)
+        if (bleMessageProcessor.isFullyReceived()) {
+            onDataReadDeferred?.complete(bleMessageProcessor.getPacket())
         }
     }
 
@@ -141,30 +141,31 @@ internal class BleManagerGattCallBacks(private val bleNetworkMessageProcessor: B
 
     internal fun subscribeToConnectionStatusChanges() = connectionStatus
 
-    //region init completions
-    internal fun initConnectOperation() {
+    internal fun subscribeToIncomeMessages() = incomeMessages
+
+    //region init deferred operations
+    internal fun initDeferredConnectOperation() {
         onConnectionEstablishedDeferred = CompletableDeferred()
     }
 
-    internal fun initReadOperation(readComplexResponse: Boolean) {
-        this.readComplexResponse = readComplexResponse
+    internal fun initDeferredReadOperation() {
         onDataReadDeferred = CompletableDeferred()
     }
 
-    internal fun initWriteDescriptorOperation() {
+    internal fun initDeferredWriteDescriptorOperation() {
         onDescriptorWriteDeferred = CompletableDeferred()
     }
 
-    internal fun initDisconnectOperation() {
+    internal fun initDeferredDisconnectOperation() {
         onDisconnectedDeferred = CompletableDeferred()
     }
 
-    internal fun initDiscoverServicesOperation() {
+    internal fun initDeferredDiscoverServicesOperation() {
         onServicesDiscoveredDeferred = CompletableDeferred()
     }
     //endregion
 
-    //region wait completions
+    //region wait deferred
     internal suspend fun waitForConnectionEstablished() = onConnectionEstablishedDeferred?.await()
         ?: throw UninitializedPropertyAccessException(
             "onConnectionEstablishedDeferred is null, you must call initConnectOperation() first"

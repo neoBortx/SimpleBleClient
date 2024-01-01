@@ -33,7 +33,7 @@ internal class BleManagerGattConnectionOperations(
         device: BluetoothDevice,
         gattCallBacks: BluetoothGattCallback
     ): BluetoothGatt? = launchGattOperation {
-        bleManagerGattCallBacks.initConnectOperation()
+        bleManagerGattCallBacks.initDeferredConnectOperation()
         device.connectGatt(context, false, gattCallBacks)?.let {
             launchDeferredOperation {
                 bleManagerGattCallBacks.waitForConnectionEstablished()
@@ -46,7 +46,7 @@ internal class BleManagerGattConnectionOperations(
     suspend fun disconnect(
         bluetoothGatt: BluetoothGatt
     ): Boolean = launchGattOperation {
-        bleManagerGattCallBacks.initDisconnectOperation()
+        bleManagerGattCallBacks.initDeferredDisconnectOperation()
         bluetoothGatt.disconnect()
         launchDeferredOperation {
             bleManagerGattCallBacks.waitForDisconnected()
@@ -63,7 +63,7 @@ internal class BleManagerGattConnectionOperations(
 
     @SuppressLint("MissingPermission")
     suspend fun discoverServices(bluetoothGatt: BluetoothGatt): Boolean = launchGattOperation {
-        bleManagerGattCallBacks.initDiscoverServicesOperation()
+        bleManagerGattCallBacks.initDeferredDiscoverServicesOperation()
         bluetoothGatt.discoverServices()
         launchDeferredOperation {
             bleManagerGattCallBacks.waitForServicesDiscovered()

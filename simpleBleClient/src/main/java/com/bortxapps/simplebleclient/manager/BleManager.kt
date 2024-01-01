@@ -2,9 +2,8 @@ package com.bortxapps.simplebleclient.manager
 
 import android.bluetooth.BluetoothGatt
 import android.content.Context
-import android.util.Log
 import com.bortxapps.simplebleclient.api.contracts.SimpleBleClient
-import com.bortxapps.simplebleclient.data.BleNetworkMessage
+import com.bortxapps.simplebleclient.api.data.BleNetworkMessage
 import com.bortxapps.simplebleclient.exceptions.BleError
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
 import com.bortxapps.simplebleclient.manager.utils.launchBleOperationWithValidations
@@ -12,6 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -62,17 +62,17 @@ internal class BleManager(
             true
         }
 
-    override suspend fun subscribeToCharacteristicChanges(characteristicsUUid: List<UUID>): Boolean =
+    override suspend fun subscribeToCharacteristicChanges(characteristicsUUid: List<UUID>): SharedFlow<BleNetworkMessage> =
         launchBleOperationWithValidations(context) {
             checkGatt()
             if (bleManagerGattConnectionOperations.discoverServices(bluetoothGatt!!)) {
                 bleManagerGattSubscriptions.subscribeToNotifications(bluetoothGatt!!, characteristicsUUid)
-                true
             } else {
-                Log.e("BleManager", "discoverServices failed")
-                false
+                throw SimpleBleClientException(BleError.UNABLE_TO_SUBSCRIBE_TO_NOTIFICATIONS)
             }
         }
+
+    override fun subscribeToIncomeMessages() = bleManagerGattSubscriptions.subscribeToIncomeMessages()
 
     override suspend fun disconnect() = launchBleOperationWithValidations(context) {
         checkGatt()
@@ -96,30 +96,26 @@ internal class BleManager(
     override suspend fun sendData(
         serviceUUID: UUID,
         characteristicUUID: UUID,
-        data: ByteArray,
-        complexResponse: Boolean
+        data: ByteArray
     ): BleNetworkMessage = launchBleOperationWithValidations(context) {
         checkGatt()
         bleManagerGattWriteOperations.sendData(
             serviceUUID,
             characteristicUUID,
             data,
-            bluetoothGatt!!,
-            complexResponse
+            bluetoothGatt!!
         )
     }
 
     override suspend fun readData(
         serviceUUID: UUID,
-        characteristicUUID: UUID,
-        complexResponse: Boolean
+        characteristicUUID: UUID
     ): BleNetworkMessage = launchBleOperationWithValidations(context) {
         checkGatt()
         bleManagerGattReadOperations.readData(
             serviceUUID,
             characteristicUUID,
-            bluetoothGatt!!,
-            complexResponse
+            bluetoothGatt!!
         )
     }
     //endregion

@@ -2,7 +2,7 @@ package com.bortxapps.simplebleclient.manager
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
-import com.bortxapps.simplebleclient.data.BleNetworkMessage
+import com.bortxapps.simplebleclient.api.data.BleNetworkMessage
 import com.bortxapps.simplebleclient.exceptions.BleError
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
 import com.bortxapps.simplebleclient.manager.utils.BleManagerGattOperationBase
@@ -21,8 +21,7 @@ internal class BleManagerGattReadOperations(
     suspend fun readData(
         serviceUUID: UUID,
         characteristicUUID: UUID,
-        bluetoothGatt: BluetoothGatt,
-        complexResponse: Boolean = false
+        bluetoothGatt: BluetoothGatt
     ): BleNetworkMessage {
         val resultRead: BleNetworkMessage?
 
@@ -30,7 +29,7 @@ internal class BleManagerGattReadOperations(
             bluetoothGatt.getService(serviceUUID)?.getCharacteristic(characteristicUUID)
         }
         resultRead = launchGattOperation {
-            bleManagerGattCallBacks.initReadOperation(complexResponse)
+            bleManagerGattCallBacks.initDeferredReadOperation()
             if (bluetoothGatt.readCharacteristic(characteristic)) {
                 launchDeferredOperation {
                     bleManagerGattCallBacks.waitForDataRead()

@@ -4,9 +4,10 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
-import com.bortxapps.simplebleclient.data.BleNetworkMessage
-import com.bortxapps.simplebleclient.data.BleNetworkMessageProcessor
+import com.bortxapps.simplebleclient.api.data.BleNetworkMessage
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
+import com.bortxapps.simplebleclient.manager.utils.BleNetworkMessageProcessorDefaultImpl
+import com.bortxapps.simplebleclient.providers.BleMessageProcessorProvider
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -30,11 +31,12 @@ internal class BleManagerGattReadOperationsTest {
     private val bluetoothGattMock: BluetoothGatt by lazy { mockk<BluetoothGatt>(relaxed = true) }
     private val bluetoothCharacteristicMock = mockk<BluetoothGattCharacteristic>(relaxed = true)
     private val bluetoothDeviceMock = mockk<BluetoothDevice>(relaxed = true)
-    private val bleNetworkMessageProcessorMock = mockk<BleNetworkMessageProcessor>(relaxed = true)
 
+    private lateinit var bleNetworkMessageProcessor: BleNetworkMessageProcessorDefaultImpl
     private lateinit var bleManagerGattReadOperations: BleManagerGattReadOperations
     private lateinit var bleManagerGattCallBacks: BleManagerGattCallBacks
     private lateinit var bleConfiguration: BleConfiguration
+    private lateinit var bleMessageProcessorProvider: BleMessageProcessorProvider
     private lateinit var mutex: Mutex
     private val callbackSlot = slot<BluetoothGattCallback>()
     private val serviceUUID = UUID.randomUUID()
@@ -42,31 +44,32 @@ internal class BleManagerGattReadOperationsTest {
     private val goProName = "GoPro123456"
     private val goProAddress = "568676970987986"
 
-    @OptIn(ExperimentalUnsignedTypes::class)
-    private val value = ByteArray(1).toUByteArray()
+    private val value = ByteArray(1)
 
-    @OptIn(ExperimentalUnsignedTypes::class)
-    private val bleNetworkMessage = BleNetworkMessage(value)
+    private val bleNetworkMessage = BleNetworkMessage(characteristicUUID, value)
 
-    @OptIn(ExperimentalUnsignedTypes::class)
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
+        bleNetworkMessageProcessor = spyk(BleNetworkMessageProcessorDefaultImpl())
         bleConfiguration = BleConfiguration().apply {
             operationTimeoutMillis = 20
+            messageProcessor = bleNetworkMessageProcessor
         }
+        bleMessageProcessorProvider = BleMessageProcessorProvider(bleConfiguration)
+
+
         mutex = Mutex()
-        bleManagerGattCallBacks = spyk(BleManagerGattCallBacks(bleNetworkMessageProcessorMock))
+        bleManagerGattCallBacks = spyk(BleManagerGattCallBacks(bleMessageProcessorProvider))
         bleManagerGattReadOperations = spyk(BleManagerGattReadOperations(bleManagerGattCallBacks, mutex, bleConfiguration))
 
         every { bluetoothDeviceMock.name } returns goProName
         every { bluetoothDeviceMock.address } returns goProAddress
 
         every { bluetoothGattMock.getService(serviceUUID)?.getCharacteristic(characteristicUUID) } returns bluetoothCharacteristicMock
-        every { bleNetworkMessageProcessorMock.processMessage(value) } just runs
-        every { bleNetworkMessageProcessorMock.processSimpleMessage(value) } just runs
-        every { bleNetworkMessageProcessorMock.isReceived() } returns true
-        every { bleNetworkMessageProcessorMock.getPacket() } returns bleNetworkMessage
+        every { bleNetworkMessageProcessor.processMessage(characteristicUUID, value) } just runs
+        every { bleNetworkMessageProcessor.isFullyReceived() } returns true
+        every { bleNetworkMessageProcessor.getPacket() } returns bleNetworkMessage
 
         every { bluetoothDeviceMock.connectGatt(any(), any(), capture(callbackSlot)) } answers {
             bluetoothGattMock
