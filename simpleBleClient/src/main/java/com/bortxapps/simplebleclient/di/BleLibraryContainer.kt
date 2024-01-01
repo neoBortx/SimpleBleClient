@@ -1,8 +1,7 @@
 package com.bortxapps.simplebleclient.di
 
-import android.bluetooth.BluetoothManager
+import android.bluetooth.le.BluetoothLeScanner
 import android.content.Context
-import androidx.core.content.ContextCompat
 import com.bortxapps.simplebleclient.exceptions.BleError
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
 import com.bortxapps.simplebleclient.manager.BleConfiguration
@@ -20,39 +19,114 @@ import com.bortxapps.simplebleclient.scanner.BleDeviceScannerManager
 import com.bortxapps.simplebleclient.scanner.BleDeviceScannerSettingsBuilder
 import kotlinx.coroutines.sync.Mutex
 
-internal class BleLibraryContainer(context: Context) {
-    // ble
-    private val blueToothScanner =
-        ContextCompat.getSystemService(context.applicationContext, BluetoothManager::class.java)?.adapter?.bluetoothLeScanner
-            ?: throw SimpleBleClientException(BleError.UNABLE_INITIALIZE_CONTROLLER)
+internal class BleLibraryContainer {
+    private lateinit var blueToothScanner: BluetoothLeScanner
+    private lateinit var bleConfiguration: BleConfiguration
 
-    val bleConfiguration = BleConfiguration()
+    private lateinit var bleDeviceScannerManager: BleDeviceScannerManager
+    private lateinit var bleManagerGattCallBacks: BleManagerGattCallBacks
+    private lateinit var bleManagerDeviceSearchOperations: BleManagerDeviceSearchOperations
+    private lateinit var bleManagerGattConnectionOperations: BleManagerGattConnectionOperations
+    private lateinit var bleManagerGattSubscriptions: BleManagerGattSubscriptions
+    private lateinit var bleManagerGattWriteOperations: BleManagerGattWriteOperations
+    private lateinit var bleManagerGattReadOperations: BleManagerGattReadOperations
 
-    private val bleDeviceScannerFilterBuilder = BleDeviceScannerFilterBuilder()
-    private val bleDeviceScannerSettingsBuilder = BleDeviceScannerSettingsBuilder()
-    private val bleDeviceScannerCallbackBuilder = BleDeviceScannerCallbackBuilder()
-    private val bleDeviceScannerManager = BleDeviceScannerManager(
-        blueToothScanner, bleDeviceScannerSettingsBuilder, bleDeviceScannerFilterBuilder, bleDeviceScannerCallbackBuilder, bleConfiguration
-    )
+    private lateinit var gattMutex: Mutex
+    private lateinit var buildVersionProvider: BuildVersionProvider
+    private lateinit var bleMessageProcessorProvider: BleMessageProcessorProvider
 
-    private val gattMutex = Mutex()
-    private val buildVersionProvider = BuildVersionProvider()
-    private val bleMessageProcessorProvider = BleMessageProcessorProvider(bleConfiguration)
+    fun init(context: Context) {
 
-    val bleManagerGattCallBacks = BleManagerGattCallBacks(bleMessageProcessorProvider)
+        gattMutex = Mutex()
 
-    val bleManagerDeviceSearchOperations = BleManagerDeviceSearchOperations(bleDeviceScannerManager)
+        bleConfiguration = BleConfiguration()
 
-    val bleManagerGattConnectionOperations = BleManagerGattConnectionOperations(
-        bleManagerDeviceSearchOperations, bleManagerGattCallBacks, gattMutex, bleConfiguration
-    )
-    val bleManagerGattSubscriptions = BleManagerGattSubscriptions(
-        bleManagerGattCallBacks, buildVersionProvider, gattMutex, bleConfiguration
-    )
-    val bleManagerGattWriteOperations = BleManagerGattWriteOperations(
-        bleManagerGattCallBacks, buildVersionProvider, gattMutex, bleConfiguration
-    )
-    val bleManagerGattReadOperations = BleManagerGattReadOperations(
-        bleManagerGattCallBacks, gattMutex, bleConfiguration
-    )
+        bleMessageProcessorProvider = BleMessageProcessorProvider(bleConfiguration)
+
+        buildVersionProvider = BuildVersionProvider()
+
+        blueToothScanner = getBlueToothScannerFactory(context)
+
+        bleDeviceScannerManager = BleDeviceScannerManager(
+            blueToothScanner, BleDeviceScannerSettingsBuilder(), BleDeviceScannerFilterBuilder(), BleDeviceScannerCallbackBuilder(), bleConfiguration
+        )
+
+        bleManagerGattCallBacks = BleManagerGattCallBacks(bleMessageProcessorProvider)
+
+        bleManagerDeviceSearchOperations = BleManagerDeviceSearchOperations(bleDeviceScannerManager)
+
+        bleManagerGattConnectionOperations = BleManagerGattConnectionOperations(
+            bleManagerDeviceSearchOperations, bleManagerGattCallBacks, gattMutex, bleConfiguration
+        )
+
+        bleManagerGattSubscriptions = BleManagerGattSubscriptions(
+            bleManagerGattCallBacks, buildVersionProvider, gattMutex, bleConfiguration
+        )
+
+        bleManagerGattWriteOperations = BleManagerGattWriteOperations(
+            bleManagerGattCallBacks, buildVersionProvider, gattMutex, bleConfiguration
+        )
+
+        bleManagerGattReadOperations = BleManagerGattReadOperations(
+            bleManagerGattCallBacks, gattMutex, bleConfiguration
+        )
+    }
+
+    fun getBleConfiguration(): BleConfiguration {
+
+        if (::bleConfiguration.isInitialized.not()) {
+            throw SimpleBleClientException(BleError.LIBRARY_NOT_INITIALIZED)
+        }
+        return bleConfiguration
+    }
+
+    fun getBleManagerDeviceSearchOperations(): BleManagerDeviceSearchOperations {
+
+        if (::bleManagerDeviceSearchOperations.isInitialized.not()) {
+            throw SimpleBleClientException(BleError.LIBRARY_NOT_INITIALIZED)
+        }
+        return bleManagerDeviceSearchOperations
+    }
+
+    fun getBleManagerGattConnectionOperations(): BleManagerGattConnectionOperations {
+
+        if (::bleManagerGattConnectionOperations.isInitialized.not()) {
+            throw SimpleBleClientException(BleError.LIBRARY_NOT_INITIALIZED)
+        }
+        return bleManagerGattConnectionOperations
+    }
+
+    fun getBleManagerGattSubscriptions(): BleManagerGattSubscriptions {
+
+        if (::bleManagerGattSubscriptions.isInitialized.not()) {
+            throw SimpleBleClientException(BleError.LIBRARY_NOT_INITIALIZED)
+        }
+        return bleManagerGattSubscriptions
+    }
+
+    fun getBleManagerGattWriteOperations(): BleManagerGattWriteOperations {
+
+        if (::bleManagerGattWriteOperations.isInitialized.not()) {
+            throw SimpleBleClientException(BleError.LIBRARY_NOT_INITIALIZED)
+        }
+        return bleManagerGattWriteOperations
+    }
+
+    fun getBleManagerGattReadOperations(): BleManagerGattReadOperations {
+
+        if (::bleManagerGattReadOperations.isInitialized.not()) {
+            throw SimpleBleClientException(BleError.LIBRARY_NOT_INITIALIZED)
+        }
+        return bleManagerGattReadOperations
+    }
+
+    fun getBleManagerGattCallBacks(): BleManagerGattCallBacks {
+
+        if (::bleManagerGattCallBacks.isInitialized.not()) {
+            throw SimpleBleClientException(BleError.LIBRARY_NOT_INITIALIZED)
+        }
+        return bleManagerGattCallBacks
+    }
+
+
 }

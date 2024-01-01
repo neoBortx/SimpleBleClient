@@ -1,5 +1,6 @@
 package com.bortxapps.simplebleclient.manager.utils
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.pm.PackageManager.PERMISSION_GRANTED
@@ -7,6 +8,7 @@ import android.os.Build
 import android.util.Log
 import com.bortxapps.simplebleclient.exceptions.BleError
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
+import com.bortxapps.simplebleclient.providers.BuildVersionProvider
 
 internal fun checkBluetoothEnabled(context: Context) {
     if (context.getSystemService(BluetoothManager::class.java)?.adapter?.isEnabled == false) {
@@ -14,18 +16,19 @@ internal fun checkBluetoothEnabled(context: Context) {
     }
 }
 
-internal fun checkPermissionsApiCodeS(context: Context) =
-    Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && (
-        context.checkSelfPermission(android.Manifest.permission.BLUETOOTH_CONNECT) != PERMISSION_GRANTED ||
-            context.checkSelfPermission(android.Manifest.permission.BLUETOOTH_SCAN) != PERMISSION_GRANTED
-        )
+@SuppressLint("InlinedApi")
+internal fun checkPermissionsNotGrantedApiCodeS(context: Context, versionProvider: BuildVersionProvider) =
+    versionProvider.getSdkVersion() >= Build.VERSION_CODES.S && (
+            context.checkSelfPermission(android.Manifest.permission.BLUETOOTH_CONNECT) != PERMISSION_GRANTED ||
+                    context.checkSelfPermission(android.Manifest.permission.BLUETOOTH_SCAN) != PERMISSION_GRANTED
+            )
 
-internal fun checkPermissionsOldApi(context: Context) =
-    Build.VERSION.SDK_INT < Build.VERSION_CODES.S &&
-        (context.checkSelfPermission(android.Manifest.permission.BLUETOOTH) != PERMISSION_GRANTED)
+internal fun checkPermissionsNotGrantedOldApi(context: Context, versionProvider: BuildVersionProvider) =
+    versionProvider.getSdkVersion() < Build.VERSION_CODES.S &&
+            (context.checkSelfPermission(android.Manifest.permission.BLUETOOTH) != PERMISSION_GRANTED)
 
-internal fun checkPermissions(context: Context) {
-    if (checkPermissionsApiCodeS(context) || checkPermissionsOldApi(context)) {
+internal fun checkPermissions(context: Context, versionProvider: BuildVersionProvider = BuildVersionProvider()) {
+    if (checkPermissionsNotGrantedApiCodeS(context, versionProvider) || checkPermissionsNotGrantedOldApi(context, versionProvider)) {
         throw SimpleBleClientException(BleError.MISSING_BLE_PERMISSIONS)
     }
 }
@@ -43,7 +46,7 @@ internal suspend fun <T> launchBleOperationWithValidations(context: Context, act
         checkPermissions(context)
         action()
     } catch (ex: SimpleBleClientException) {
-        Log.e("RepositoryBaseBle", "launchBleOperationWithValidations error -> $ex - ${ex.stackTraceToString()}")
+        Log.e("RepositoryBaseBle", "launchBleOperationWithValidations SimpleBleClientException -> $ex - ${ex.stackTraceToString()}")
         throw ex
     } catch (ex: Exception) {
         Log.e("RepositoryBaseBle", "launchBleOperationWithValidations error -> $ex - ${ex.stackTraceToString()}")

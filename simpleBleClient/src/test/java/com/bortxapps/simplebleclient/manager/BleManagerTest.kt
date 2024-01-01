@@ -11,8 +11,8 @@ import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
 import com.bortxapps.simplebleclient.manager.utils.checkBleHardwareAvailable
 import com.bortxapps.simplebleclient.manager.utils.checkBluetoothEnabled
 import com.bortxapps.simplebleclient.manager.utils.checkPermissions
-import com.bortxapps.simplebleclient.manager.utils.checkPermissionsApiCodeS
-import com.bortxapps.simplebleclient.manager.utils.checkPermissionsOldApi
+import com.bortxapps.simplebleclient.manager.utils.checkPermissionsNotGrantedApiCodeS
+import com.bortxapps.simplebleclient.manager.utils.checkPermissionsNotGrantedOldApi
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -31,6 +31,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -61,9 +62,9 @@ internal class BleManagerTest {
     private val goProName = "GoPro123456"
     private val goProAddress = "568676970987986"
     private val characteristics = listOf(characteristicUUID)
-    
+
     private val value = ByteArray(1)
-    
+
     private val bleNetworkMessage = BleNetworkMessage(characteristicUUID, value)
 
     private val characteristicMessageFlow = MutableSharedFlow<BleNetworkMessage>()
@@ -71,8 +72,8 @@ internal class BleManagerTest {
     @Before
     fun setUp() {
         mockkStatic(::checkBluetoothEnabled)
-        mockkStatic(::checkPermissionsApiCodeS)
-        mockkStatic(::checkPermissionsOldApi)
+        mockkStatic(::checkPermissionsNotGrantedApiCodeS)
+        mockkStatic(::checkPermissionsNotGrantedOldApi)
         mockkStatic(::checkPermissions)
         mockkStatic(::checkBleHardwareAvailable)
 
@@ -316,6 +317,62 @@ internal class BleManagerTest {
         }
     }
     //endregion
+
+    //region subscribeToCharacteristicChanges
+    @Test
+    fun `subscribeToCharacteristicChanges gatt not initialized expect exception`() = runTest {
+        Assert.assertThrows(SimpleBleClientException::class.java) {
+            runBlocking {
+                bleManager.subscribeToCharacteristicChanges(characteristics)
+            }
+        }
+    }
+
+    @Test
+    fun `subscribeToCharacteristicChanges gatt initialized expect subscribeToNotifications invoked`() = runTest {
+        coEvery {
+            bleManagerGattConnectionOperationsMock.connectToDevice(
+                contextMock,
+                goProAddress,
+                bleManagerGattCallBacksMock
+            )
+        } returns bluetoothGattMock
+        coEvery { bleManagerGattConnectionOperationsMock.discoverServices(bluetoothGattMock) } returns true
+        coEvery { bleManagerGattSubscriptionsMock.subscribeToNotifications(bluetoothGattMock, characteristics) } returns characteristicMessageFlow
+
+        bleManager.connectToDevice(contextMock, goProAddress)
+        assertEquals(characteristicMessageFlow, bleManager.subscribeToCharacteristicChanges(characteristics))
+
+    }
+
+    @Test
+    fun `subscribeToCharacteristicChanges gatt initialized discoverServices fails should throw exception`() = runTest {
+        coEvery {
+            bleManagerGattConnectionOperationsMock.connectToDevice(
+                contextMock,
+                goProAddress,
+                bleManagerGattCallBacksMock
+            )
+        } returns bluetoothGattMock
+        coEvery { bleManagerGattConnectionOperationsMock.discoverServices(bluetoothGattMock) } returns false
+
+        Assert.assertThrows(SimpleBleClientException::class.java) {
+            runBlocking {
+                bleManager.connectToDevice(contextMock, goProAddress)
+                bleManager.subscribeToCharacteristicChanges(characteristics)
+            }
+        }
+    }
+    //endregion
+
+    //region subscribeToIncomeMessages
+    @Test
+    fun `subscribeToIncomeMessages just calls helper class`() {
+
+        every { bleManagerGattSubscriptionsMock.subscribeToIncomeMessages() } returns characteristicMessageFlow
+
+        assertEquals(characteristicMessageFlow, bleManager.subscribeToIncomeMessages())
+    }
 
     private fun mockValidationsAllOk() {
         coEvery { checkBluetoothEnabled(any()) } returns Unit

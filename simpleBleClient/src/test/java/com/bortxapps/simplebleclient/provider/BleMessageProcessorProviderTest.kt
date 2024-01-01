@@ -7,10 +7,10 @@ import com.bortxapps.simplebleclient.providers.BleMessageProcessorProvider
 import io.mockk.mockk
 import org.junit.Test
 
-public class BleMessageProcessorProviderTest {
+internal class BleMessageProcessorProviderTest {
 
     @Test
-    public fun `getMessageProcessor should return a BleNetworkMessageProcessorDefaultImpl when not processor is not provided in the BleConfiguration`() {
+    fun `getMessageProcessor should return a BleNetworkMessageProcessorDefaultImpl when not processor is not provided in the BleConfiguration`() {
         // Given
         val bleConfiguration = BleConfiguration()
         val bleMessageProcessorProvider = BleMessageProcessorProvider(bleConfiguration)
@@ -23,7 +23,7 @@ public class BleMessageProcessorProviderTest {
     }
 
     @Test
-    public fun `getMessageProcessor should return the BleNetworkMessageProcessor provided in the BleConfiguration`() {
+    fun `getMessageProcessor should return the BleNetworkMessageProcessor provided in the BleConfiguration`() {
         // Given
         val bleConfiguration = BleConfiguration()
         val bleNetworkMessageProcessor = mockk<BleNetworkMessageProcessor>()
