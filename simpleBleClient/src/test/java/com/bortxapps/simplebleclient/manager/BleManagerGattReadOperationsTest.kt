@@ -60,7 +60,7 @@ internal class BleManagerGattReadOperationsTest {
 
 
         mutex = Mutex()
-        bleManagerGattCallBacks = spyk(BleManagerGattCallBacks(bleMessageProcessorProvider))
+        bleManagerGattCallBacks = spyk(BleManagerGattCallBacks(bleConfiguration, bleMessageProcessorProvider))
         bleManagerGattReadOperations = spyk(BleManagerGattReadOperations(bleManagerGattCallBacks, mutex, bleConfiguration))
 
         every { bluetoothDeviceMock.name } returns goProName

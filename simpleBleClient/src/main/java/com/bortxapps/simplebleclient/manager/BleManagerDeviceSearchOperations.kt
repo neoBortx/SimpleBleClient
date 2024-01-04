@@ -19,7 +19,7 @@ internal class BleManagerDeviceSearchOperations(
 
     private var searchingDevices = false
     private val detectedDevices = mutableListOf<BluetoothDevice>()
-    fun getDevicesByService(serviceUUID: UUID?, deviceName: String?): Flow<BluetoothDevice> {
+    fun getDevicesNearBy(serviceUUID: UUID?, deviceName: String?): Flow<BluetoothDevice> {
         if (!searchingDevices) {
             searchingDevices = true
             detectedDevices.clear()
@@ -35,11 +35,11 @@ internal class BleManagerDeviceSearchOperations(
     }
 
     @SuppressLint("MissingPermission")
-    fun getPairedDevicesByPrefix(context: Context, deviceNamePrefix: String): List<BluetoothDevice> =
+    fun getPairedDevicesByPrefix(context: Context): List<BluetoothDevice> =
         context.getSystemService(BluetoothManager::class.java)
             ?.adapter
             ?.bondedDevices
-            ?.filter { it.name.startsWith(deviceNamePrefix) }
+            ?.toList()
             .orEmpty()
 
     fun getDetectedDevices() = detectedDevices.toList()

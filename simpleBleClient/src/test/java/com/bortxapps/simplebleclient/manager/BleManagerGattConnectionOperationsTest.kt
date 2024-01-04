@@ -54,7 +54,7 @@ internal class BleManagerGattConnectionOperationsTest {
             operationTimeoutMillis = 20
         }
         bleMessageProcessorProvider = BleMessageProcessorProvider(bleConfiguration)
-        bleManagerGattCallBacks = spyk(BleManagerGattCallBacks(bleMessageProcessorProvider))
+        bleManagerGattCallBacks = spyk(BleManagerGattCallBacks(bleConfiguration, bleMessageProcessorProvider))
         bleManagerGattConnectionOperations =
             spyk(BleManagerGattConnectionOperations(bleManagerDeviceConnectionMock, bleManagerGattCallBacks, mutex, bleConfiguration))
 

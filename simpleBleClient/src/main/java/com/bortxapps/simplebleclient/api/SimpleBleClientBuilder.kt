@@ -44,6 +44,8 @@ public class SimpleBleClientBuilder {
     private var operationTimeOutMillisConf: Long? = null
     private var scanPeriodMillisConf: Long? = null
     private var messageProcessorConf: BleNetworkMessageProcessor? = null
+    private var messageBufferSizeConf: Int? = null
+    private var messageBufferRetriesConf: Int? = null
 
     @VisibleForTesting
     internal var bleLibraryContainer: BleLibraryContainer = BleLibraryContainer()
@@ -57,6 +59,12 @@ public class SimpleBleClientBuilder {
     public fun setMessageProcessor(messageProcessor: BleNetworkMessageProcessor): SimpleBleClientBuilder =
         apply { this.messageProcessorConf = messageProcessor }
 
+    public fun setMessageBufferSize(messageBufferSize: Int): SimpleBleClientBuilder =
+        apply { this.messageBufferSizeConf = messageBufferSize }
+
+    public fun setMessageBufferRetries(messageBufferRetries: Int): SimpleBleClientBuilder =
+        apply { this.messageBufferRetriesConf = messageBufferRetries }
+
     public fun build(context: Context): SimpleBleClient {
         return buildInstance(context)
     }
@@ -69,6 +77,8 @@ public class SimpleBleClientBuilder {
             operationTimeOutMillisConf?.let { operationTimeoutMillis = it }
             scanPeriodMillisConf?.let { scanPeriodMillis = it }
             messageProcessorConf?.let { messageProcessor = it }
+            messageBufferSizeConf?.let { messageBufferSize = it }
+            messageBufferRetriesConf?.let { messageBufferRetries = it }
         }
 
         with(bleLibraryContainer) {

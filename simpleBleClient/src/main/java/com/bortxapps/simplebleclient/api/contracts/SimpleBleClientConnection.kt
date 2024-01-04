@@ -1,8 +1,9 @@
 package com.bortxapps.simplebleclient.api.contracts
 
 import android.content.Context
+import com.bortxapps.simplebleclient.api.data.BleConnectionStatus
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.Flow
 
 public interface SimpleBleClientConnection {
 
@@ -26,13 +27,12 @@ public interface SimpleBleClientConnection {
     public suspend fun disconnect()
 
     /**
-     * TODO change to return an enum instead of an INT
      * Subscribes to the changes in the connection status of the BLE device.
      *
-     * @return A [MutableStateFlow] that emits connection status updates as integers.
+     * @return A [Flow] that emits connection status updates as [BleConnectionStatus].
      *
      * @throws SimpleBleClientException Thrown when an error occurs during the BLE operation.
      */
 
-    public fun subscribeToConnectionStatusChanges(): MutableStateFlow<Int>
+    public fun subscribeToConnectionStatusChanges(): Flow<BleConnectionStatus>
 }
