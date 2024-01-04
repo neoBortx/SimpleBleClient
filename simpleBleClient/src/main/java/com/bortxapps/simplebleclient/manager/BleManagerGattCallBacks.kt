@@ -26,13 +26,12 @@ internal class BleManagerGattCallBacks(bleConfiguration: BleConfiguration, bleMe
     private var onServicesDiscoveredDeferred: CompletableDeferred<Boolean>? = null
     //endregion
 
-    private var connectionStatus: MutableStateFlow<Int> = MutableStateFlow(BluetoothProfile.STATE_DISCONNECTED)
-    private var incomeMessages: MutableSharedFlow<BleNetworkMessage> = MutableSharedFlow(
+    private val connectionStatus: MutableStateFlow<Int> = MutableStateFlow(BluetoothProfile.STATE_DISCONNECTED)
+    private val incomeMessages: MutableSharedFlow<BleNetworkMessage> = MutableSharedFlow(
         replay = bleConfiguration.messageBufferRetries,
         extraBufferCapacity = bleConfiguration.messageBufferSize
     )
-
-    private var bleMessageProcessor: BleNetworkMessageProcessor = bleMessageProcessorProvider.getMessageProcessor()
+    private val bleMessageProcessor: BleNetworkMessageProcessor = bleMessageProcessorProvider.getMessageProcessor()
 
     override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
         if (status == BluetoothGatt.GATT_SUCCESS) {

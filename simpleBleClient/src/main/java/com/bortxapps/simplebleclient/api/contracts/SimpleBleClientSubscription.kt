@@ -16,7 +16,7 @@ public interface SimpleBleClientSubscription {
      *
      * @throws SimpleBleClientException Thrown when an error occurs during the BLE operation.
      */
-    public suspend fun subscribeToCharacteristicChanges(characteristicsUUid: List<UUID>): SharedFlow<BleNetworkMessage>
+    public suspend fun subscribeToCharacteristicChanges(characteristicsUUid: List<UUID>): Boolean
 
     /**
      * Ge the shared flow that emits [BleNetworkMessage] objects with the changes in the subscribed characteristics.

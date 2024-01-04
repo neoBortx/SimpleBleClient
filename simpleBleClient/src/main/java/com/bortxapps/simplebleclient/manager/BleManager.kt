@@ -7,12 +7,12 @@ import com.bortxapps.simplebleclient.api.data.BleNetworkMessage
 import com.bortxapps.simplebleclient.exceptions.BleError
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
 import com.bortxapps.simplebleclient.manager.utils.launchBleOperationWithValidations
+import com.bortxapps.simplebleclient.manager.utils.launchBleOperationWithValidationsSync
 import com.bortxapps.simplebleclient.manager.utils.mapBleConnectionState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -40,7 +40,7 @@ internal class BleManager(
     }
 
     //region search devices
-    override suspend fun getDevicesNearby(serviceUUID: UUID?, deviceName: String?) = launchBleOperationWithValidations(context) {
+    override fun getDevicesNearby(serviceUUID: UUID?, deviceName: String?) = launchBleOperationWithValidationsSync(context) {
         bleManagerDeviceConnection.getDevicesNearBy(serviceUUID, deviceName)
     }
 
@@ -64,7 +64,7 @@ internal class BleManager(
             true
         }
 
-    override suspend fun subscribeToCharacteristicChanges(characteristicsUUid: List<UUID>): SharedFlow<BleNetworkMessage> =
+    override suspend fun subscribeToCharacteristicChanges(characteristicsUUid: List<UUID>): Boolean =
         launchBleOperationWithValidations(context) {
             checkGatt()
             if (bleManagerGattConnectionOperations.discoverServices(bluetoothGatt!!)) {
