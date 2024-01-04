@@ -30,7 +30,7 @@ internal class BleManagerGattSubscriptions(
         private const val BLE_DESCRIPTION_BASE_UUID = "00002902-0000-1000-8000-00805F9B34FB"
     }
 
-    suspend fun subscribeToNotifications(bluetoothGatt: BluetoothGatt, characteristicsUUid: List<UUID>): SharedFlow<BleNetworkMessage> {
+    suspend fun subscribeToNotifications(bluetoothGatt: BluetoothGatt, characteristicsUUid: List<UUID>): Boolean {
         getNotifiableCharacteristics(bluetoothGatt, characteristicsUUid).forEach { characteristic ->
             withContext(IO) {
                 launchGattOperation {
@@ -46,7 +46,7 @@ internal class BleManagerGattSubscriptions(
             }
         }
 
-        return bleManagerGattCallBacks.subscribeToIncomeMessages()
+        return true
     }
 
     fun subscribeToIncomeMessages(): SharedFlow<BleNetworkMessage> = bleManagerGattCallBacks.subscribeToIncomeMessages()

@@ -155,7 +155,7 @@ internal class BleManagerTest {
             )
         } returns bluetoothGattMock
         coEvery { bleManagerGattConnectionOperationsMock.discoverServices(bluetoothGattMock) } returns true
-        coEvery { bleManagerGattSubscriptionsMock.subscribeToNotifications(bluetoothGattMock, characteristics) } returns characteristicMessageFlow
+        coEvery { bleManagerGattSubscriptionsMock.subscribeToNotifications(bluetoothGattMock, characteristics) } returns true
 
         runBlocking {
             assertTrue(bleManager.connectToDevice(contextMock, goProAddress))
@@ -167,7 +167,7 @@ internal class BleManagerTest {
     fun `connectToDevice returns null expect SimpleBleClientException`() = runTest {
         coEvery { bleManagerGattConnectionOperationsMock.connectToDevice(contextMock, goProAddress, bleManagerGattCallBacksMock) } returns null
         coEvery { bleManagerGattConnectionOperationsMock.discoverServices(bluetoothGattMock) } returns true
-        coEvery { bleManagerGattSubscriptionsMock.subscribeToNotifications(bluetoothGattMock, characteristics) } returns characteristicMessageFlow
+        coEvery { bleManagerGattSubscriptionsMock.subscribeToNotifications(bluetoothGattMock, characteristics) } returns true
 
         Assert.assertThrows(SimpleBleClientException::class.java) {
             runBlocking {
@@ -199,7 +199,7 @@ internal class BleManagerTest {
             )
         } returns bluetoothGattMock
         coEvery { bleManagerGattConnectionOperationsMock.discoverServices(bluetoothGattMock) } returns false
-        coEvery { bleManagerGattSubscriptionsMock.subscribeToNotifications(bluetoothGattMock, characteristics) } returns characteristicMessageFlow
+        coEvery { bleManagerGattSubscriptionsMock.subscribeToNotifications(bluetoothGattMock, characteristics) } returns true
         coEvery { bleManagerGattConnectionOperationsMock.disconnect(bluetoothGattMock) } returns false
 
         runBlocking {
@@ -219,7 +219,7 @@ internal class BleManagerTest {
             )
         } returns bluetoothGattMock
         coEvery { bleManagerGattConnectionOperationsMock.discoverServices(bluetoothGattMock) } returns false
-        coEvery { bleManagerGattSubscriptionsMock.subscribeToNotifications(bluetoothGattMock, characteristics) } returns characteristicMessageFlow
+        coEvery { bleManagerGattSubscriptionsMock.subscribeToNotifications(bluetoothGattMock, characteristics) } returns true
         coEvery { bleManagerGattConnectionOperationsMock.disconnect(bluetoothGattMock) } returns true
         coEvery { bleManagerGattConnectionOperationsMock.freeConnection(bluetoothGattMock) } just runs
         coEvery { bleManagerGattCallBacksMock.reset() } just runs
@@ -263,7 +263,7 @@ internal class BleManagerTest {
             )
         } returns bluetoothGattMock
         coEvery { bleManagerGattConnectionOperationsMock.discoverServices(bluetoothGattMock) } returns false
-        coEvery { bleManagerGattSubscriptionsMock.subscribeToNotifications(bluetoothGattMock, characteristics) } returns characteristicMessageFlow
+        coEvery { bleManagerGattSubscriptionsMock.subscribeToNotifications(bluetoothGattMock, characteristics) } returns true
         coEvery { bleManagerGattConnectionOperationsMock.disconnect(bluetoothGattMock) } returns false
         coEvery {
             bleManagerGattWriteOperationsMock.sendData(
@@ -301,7 +301,7 @@ internal class BleManagerTest {
             )
         } returns bluetoothGattMock
         coEvery { bleManagerGattConnectionOperationsMock.discoverServices(bluetoothGattMock) } returns false
-        coEvery { bleManagerGattSubscriptionsMock.subscribeToNotifications(bluetoothGattMock, characteristics) } returns characteristicMessageFlow
+        coEvery { bleManagerGattSubscriptionsMock.subscribeToNotifications(bluetoothGattMock, characteristics) } returns true
         coEvery { bleManagerGattConnectionOperationsMock.disconnect(bluetoothGattMock) } returns false
         coEvery {
             bleManagerGattReadOperationsMock.readData(
@@ -338,10 +338,10 @@ internal class BleManagerTest {
             )
         } returns bluetoothGattMock
         coEvery { bleManagerGattConnectionOperationsMock.discoverServices(bluetoothGattMock) } returns true
-        coEvery { bleManagerGattSubscriptionsMock.subscribeToNotifications(bluetoothGattMock, characteristics) } returns characteristicMessageFlow
+        coEvery { bleManagerGattSubscriptionsMock.subscribeToNotifications(bluetoothGattMock, characteristics) } returns true
 
         bleManager.connectToDevice(contextMock, goProAddress)
-        assertEquals(characteristicMessageFlow, bleManager.subscribeToCharacteristicChanges(characteristics))
+        assertEquals(true, bleManager.subscribeToCharacteristicChanges(characteristics))
     }
 
     @Test

@@ -27,7 +27,7 @@ public interface SimpleBleClientDeviceSeeker {
      * @throws SimpleBleClientException Thrown when an error occurs during the BLE operation.
      *
      */
-    public suspend fun getDevicesNearby(serviceUUID: UUID? = null, deviceName: String? = null): Flow<BluetoothDevice>
+    public fun getDevicesNearby(serviceUUID: UUID? = null, deviceName: String? = null): Flow<BluetoothDevice>
 
     /**
      *

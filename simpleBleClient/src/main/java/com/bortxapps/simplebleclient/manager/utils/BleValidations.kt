@@ -53,3 +53,18 @@ internal suspend fun <T> launchBleOperationWithValidations(context: Context, act
         throw SimpleBleClientException(BleError.OTHER)
     }
 }
+
+internal fun <T> launchBleOperationWithValidationsSync(context: Context, action: () -> T): T {
+    return try {
+        checkBleHardwareAvailable(context)
+        checkBluetoothEnabled(context)
+        checkPermissions(context)
+        action()
+    } catch (ex: SimpleBleClientException) {
+        Log.e("RepositoryBaseBle", "launchBleOperationWithValidations SimpleBleClientException -> $ex - ${ex.stackTraceToString()}")
+        throw ex
+    } catch (ex: Exception) {
+        Log.e("RepositoryBaseBle", "launchBleOperationWithValidations error -> $ex - ${ex.stackTraceToString()}")
+        throw SimpleBleClientException(BleError.OTHER)
+    }
+}
