@@ -32,6 +32,6 @@ public interface SimpleBleClientWriter {
     public suspend fun sendData(
         serviceUUID: UUID,
         characteristicUUID: UUID,
-        data: ByteArray,
+        data: ByteArray
     ): BleNetworkMessage
 }

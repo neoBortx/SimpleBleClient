@@ -58,7 +58,6 @@ internal class BleManagerGattReadOperationsTest {
         }
         bleMessageProcessorProvider = BleMessageProcessorProvider(bleConfiguration)
 
-
         mutex = Mutex()
         bleManagerGattCallBacks = spyk(BleManagerGattCallBacks(bleConfiguration, bleMessageProcessorProvider))
         bleManagerGattReadOperations = spyk(BleManagerGattReadOperations(bleManagerGattCallBacks, mutex, bleConfiguration))

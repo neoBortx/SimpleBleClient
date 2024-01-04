@@ -26,7 +26,7 @@ internal class BleManagerGattWriteOperations(
         serviceUUID: UUID,
         characteristicUUID: UUID,
         data: ByteArray,
-        bluetoothGatt: BluetoothGatt,
+        bluetoothGatt: BluetoothGatt
     ): BleNetworkMessage {
         bluetoothGatt.getService(serviceUUID)?.getCharacteristic(characteristicUUID)?.let {
             return writeCharacteristic(
@@ -45,7 +45,7 @@ internal class BleManagerGattWriteOperations(
     private suspend fun writeCharacteristic(
         bluetoothGatt: BluetoothGatt,
         value: ByteArray,
-        characteristic: BluetoothGattCharacteristic,
+        characteristic: BluetoothGattCharacteristic
     ): BleNetworkMessage {
         return launchGattOperation {
             bleManagerGattCallBacks.initDeferredReadOperation()

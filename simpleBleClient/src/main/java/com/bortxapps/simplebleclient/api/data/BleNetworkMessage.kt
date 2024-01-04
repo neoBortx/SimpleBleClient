@@ -2,7 +2,6 @@ package com.bortxapps.simplebleclient.api.data
 
 import java.util.UUID
 
-
 /**
  * Represents a message exchanged with a BLE (Bluetooth Low Energy) device.
  *

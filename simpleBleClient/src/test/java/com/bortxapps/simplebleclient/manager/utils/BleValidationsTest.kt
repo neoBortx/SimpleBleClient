@@ -95,7 +95,6 @@ internal class BleValidationsTest {
         assertFalse(checkPermissionsNotGrantedOldApi(context, versionProvider))
     }
 
-
     @Test
     fun `checkPermissions version api S and not granted should throw exception`() {
         every { versionProvider.getSdkVersion() } returns 32
@@ -188,5 +187,4 @@ internal class BleValidationsTest {
             assertEquals(BleError.INTERNAL_ERROR, e.bleError)
         }
     }
-
 }

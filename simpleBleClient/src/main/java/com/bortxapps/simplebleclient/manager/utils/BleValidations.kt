@@ -19,13 +19,13 @@ internal fun checkBluetoothEnabled(context: Context) {
 @SuppressLint("InlinedApi")
 internal fun checkPermissionsNotGrantedApiCodeS(context: Context, versionProvider: BuildVersionProvider) =
     versionProvider.getSdkVersion() >= Build.VERSION_CODES.S && (
-            context.checkSelfPermission(android.Manifest.permission.BLUETOOTH_CONNECT) != PERMISSION_GRANTED ||
-                    context.checkSelfPermission(android.Manifest.permission.BLUETOOTH_SCAN) != PERMISSION_GRANTED
-            )
+        context.checkSelfPermission(android.Manifest.permission.BLUETOOTH_CONNECT) != PERMISSION_GRANTED ||
+            context.checkSelfPermission(android.Manifest.permission.BLUETOOTH_SCAN) != PERMISSION_GRANTED
+        )
 
 internal fun checkPermissionsNotGrantedOldApi(context: Context, versionProvider: BuildVersionProvider) =
     versionProvider.getSdkVersion() < Build.VERSION_CODES.S &&
-            (context.checkSelfPermission(android.Manifest.permission.BLUETOOTH) != PERMISSION_GRANTED)
+        (context.checkSelfPermission(android.Manifest.permission.BLUETOOTH) != PERMISSION_GRANTED)
 
 internal fun checkPermissions(context: Context, versionProvider: BuildVersionProvider = BuildVersionProvider()) {
     if (checkPermissionsNotGrantedApiCodeS(context, versionProvider) || checkPermissionsNotGrantedOldApi(context, versionProvider)) {

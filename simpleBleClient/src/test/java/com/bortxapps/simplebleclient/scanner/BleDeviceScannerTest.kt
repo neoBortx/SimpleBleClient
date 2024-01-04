@@ -87,7 +87,6 @@ internal class BleDeviceScannerTest {
 
         coVerify(exactly = 1) { bleDeviceScannerFilterBuilderMock.buildFilterByService(serviceUuid) }
         coVerify(exactly = 1) { bleDeviceScannerFilterBuilderMock.buildFilterByDeviceName(deviceName) }
-
     }
 
     @Test

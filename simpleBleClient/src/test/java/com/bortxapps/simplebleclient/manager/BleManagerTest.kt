@@ -270,7 +270,7 @@ internal class BleManagerTest {
                 serviceUUID,
                 characteristicUUID,
                 value,
-                bluetoothGattMock,
+                bluetoothGattMock
             )
         } returns bleNetworkMessage
 
@@ -342,7 +342,6 @@ internal class BleManagerTest {
 
         bleManager.connectToDevice(contextMock, goProAddress)
         assertEquals(characteristicMessageFlow, bleManager.subscribeToCharacteristicChanges(characteristics))
-
     }
 
     @Test
@@ -368,7 +367,6 @@ internal class BleManagerTest {
     //region subscribeToIncomeMessages
     @Test
     fun `subscribeToIncomeMessages just calls helper class`() {
-
         every { bleManagerGattSubscriptionsMock.subscribeToIncomeMessages() } returns characteristicMessageFlow
 
         assertEquals(characteristicMessageFlow, bleManager.subscribeToIncomeMessages())
