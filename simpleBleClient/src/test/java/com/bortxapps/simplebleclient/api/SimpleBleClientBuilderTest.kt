@@ -49,16 +49,16 @@ internal class SimpleBleClientBuilderTest {
 
         val builder = SimpleBleClientBuilder()
 
-        assertNotNull(builder
-            .setOperationTimeOutMillis(customTimeout)
-            .setScanPeriodMillis(customScanPeriod)
-            .setMessageProcessor(customMessageProcessor)
-            .build(context))
+        assertNotNull(
+            builder
+                .setOperationTimeOutMillis(customTimeout)
+                .setScanPeriodMillis(customScanPeriod)
+                .setMessageProcessor(customMessageProcessor)
+                .build(context)
+        )
 
         assertEquals(customTimeout, builder.bleLibraryContainer.getBleConfiguration().operationTimeoutMillis)
         assertEquals(customScanPeriod, builder.bleLibraryContainer.getBleConfiguration().scanPeriodMillis)
         assertEquals(customMessageProcessor, builder.bleLibraryContainer.getBleConfiguration().messageProcessor)
     }
-
-
 }

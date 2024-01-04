@@ -3,7 +3,6 @@ package com.bortxapps.simplebleclient.api.contracts
 import com.bortxapps.simplebleclient.api.data.BleNetworkMessage
 import java.util.UUID
 
-
 /**
  * Depending on the protocol used by the device, the message received from the device can be fragmented or may require a special treatment.
  *
@@ -19,7 +18,6 @@ public interface BleNetworkMessageProcessor {
      * Indicates if all fragments of the message have been received.
      */
     public fun isFullyReceived(): Boolean
-
 
     /**
      * Usually there are two different cases:
@@ -45,5 +43,4 @@ public interface BleNetworkMessageProcessor {
      * Clears the data stored in the processor. called in error cases.
      */
     public fun clearData()
-
 }

@@ -37,5 +37,4 @@ internal class BleMessageProcessorProviderTest {
         // Then
         assert(messageProcessor == bleNetworkMessageProcessor)
     }
-
 }

@@ -14,6 +14,7 @@ internal class BleNetworkMessageProcessorDefaultImplTest {
     private lateinit var messageProcessor: BleNetworkMessageProcessorDefaultImpl
     private val characteristicUUID = UUID.randomUUID()
     val testData = byteArrayOf(0x04, 0x01, 0x05, 0x10, 0x20)
+
     @Before
     fun setUp() {
         messageProcessor = BleNetworkMessageProcessorDefaultImpl()
@@ -21,8 +22,6 @@ internal class BleNetworkMessageProcessorDefaultImplTest {
 
     @Test
     fun `test processMessage should fill internal buffer and store characteristics`() {
-
-
         messageProcessor.processMessage(characteristicUUID, testData)
 
         val res = messageProcessor.getPacket()
@@ -34,7 +33,7 @@ internal class BleNetworkMessageProcessorDefaultImplTest {
     }
 
     @Test
-    fun `call clearData should erase all information`(){
+    fun `call clearData should erase all information`() {
         messageProcessor.processMessage(characteristicUUID, testData)
         messageProcessor.clearData()
 

@@ -70,7 +70,6 @@ public class SimpleBleClientBuilder {
     }
 
     private fun buildInstance(context: Context): SimpleBleClient {
-
         bleLibraryContainer.init(context)
 
         with(bleLibraryContainer.getBleConfiguration()) {

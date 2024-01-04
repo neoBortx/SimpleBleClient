@@ -36,7 +36,6 @@ internal class BleLibraryContainer {
     private lateinit var bleMessageProcessorProvider: BleMessageProcessorProvider
 
     fun init(context: Context) {
-
         gattMutex = Mutex()
 
         bleConfiguration = BleConfiguration()
@@ -48,7 +47,11 @@ internal class BleLibraryContainer {
         blueToothScanner = getBlueToothScannerFactory(context)
 
         bleDeviceScannerManager = BleDeviceScannerManager(
-            blueToothScanner, BleDeviceScannerSettingsBuilder(), BleDeviceScannerFilterBuilder(), BleDeviceScannerCallbackBuilder(), bleConfiguration
+            blueToothScanner,
+            BleDeviceScannerSettingsBuilder(),
+            BleDeviceScannerFilterBuilder(),
+            BleDeviceScannerCallbackBuilder(),
+            bleConfiguration
         )
 
         bleManagerGattCallBacks = BleManagerGattCallBacks(bleConfiguration, bleMessageProcessorProvider)
@@ -56,24 +59,34 @@ internal class BleLibraryContainer {
         bleManagerDeviceSearchOperations = BleManagerDeviceSearchOperations(bleDeviceScannerManager)
 
         bleManagerGattConnectionOperations = BleManagerGattConnectionOperations(
-            bleManagerDeviceSearchOperations, bleManagerGattCallBacks, gattMutex, bleConfiguration
+            bleManagerDeviceSearchOperations,
+            bleManagerGattCallBacks,
+            gattMutex,
+            bleConfiguration
         )
 
         bleManagerGattSubscriptions = BleManagerGattSubscriptions(
-            bleManagerGattCallBacks, buildVersionProvider, gattMutex, bleConfiguration
+            bleManagerGattCallBacks,
+            buildVersionProvider,
+            gattMutex,
+            bleConfiguration
         )
 
         bleManagerGattWriteOperations = BleManagerGattWriteOperations(
-            bleManagerGattCallBacks, buildVersionProvider, gattMutex, bleConfiguration
+            bleManagerGattCallBacks,
+            buildVersionProvider,
+            gattMutex,
+            bleConfiguration
         )
 
         bleManagerGattReadOperations = BleManagerGattReadOperations(
-            bleManagerGattCallBacks, gattMutex, bleConfiguration
+            bleManagerGattCallBacks,
+            gattMutex,
+            bleConfiguration
         )
     }
 
     fun getBleConfiguration(): BleConfiguration {
-
         if (::bleConfiguration.isInitialized.not()) {
             throw SimpleBleClientException(BleError.LIBRARY_NOT_INITIALIZED)
         }
@@ -81,7 +94,6 @@ internal class BleLibraryContainer {
     }
 
     fun getBleManagerDeviceSearchOperations(): BleManagerDeviceSearchOperations {
-
         if (::bleManagerDeviceSearchOperations.isInitialized.not()) {
             throw SimpleBleClientException(BleError.LIBRARY_NOT_INITIALIZED)
         }
@@ -89,7 +101,6 @@ internal class BleLibraryContainer {
     }
 
     fun getBleManagerGattConnectionOperations(): BleManagerGattConnectionOperations {
-
         if (::bleManagerGattConnectionOperations.isInitialized.not()) {
             throw SimpleBleClientException(BleError.LIBRARY_NOT_INITIALIZED)
         }
@@ -97,7 +108,6 @@ internal class BleLibraryContainer {
     }
 
     fun getBleManagerGattSubscriptions(): BleManagerGattSubscriptions {
-
         if (::bleManagerGattSubscriptions.isInitialized.not()) {
             throw SimpleBleClientException(BleError.LIBRARY_NOT_INITIALIZED)
         }
@@ -105,7 +115,6 @@ internal class BleLibraryContainer {
     }
 
     fun getBleManagerGattWriteOperations(): BleManagerGattWriteOperations {
-
         if (::bleManagerGattWriteOperations.isInitialized.not()) {
             throw SimpleBleClientException(BleError.LIBRARY_NOT_INITIALIZED)
         }
@@ -113,7 +122,6 @@ internal class BleLibraryContainer {
     }
 
     fun getBleManagerGattReadOperations(): BleManagerGattReadOperations {
-
         if (::bleManagerGattReadOperations.isInitialized.not()) {
             throw SimpleBleClientException(BleError.LIBRARY_NOT_INITIALIZED)
         }
@@ -121,12 +129,9 @@ internal class BleLibraryContainer {
     }
 
     fun getBleManagerGattCallBacks(): BleManagerGattCallBacks {
-
         if (::bleManagerGattCallBacks.isInitialized.not()) {
             throw SimpleBleClientException(BleError.LIBRARY_NOT_INITIALIZED)
         }
         return bleManagerGattCallBacks
     }
-
-
 }

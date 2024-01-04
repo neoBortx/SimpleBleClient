@@ -32,7 +32,6 @@ import java.util.UUID
 
 internal class BleManagerGattSubscriptionsTest {
 
-
     private val bluetoothDeviceMock = mockk<BluetoothDevice>(relaxed = true)
     private val bluetoothDeviceMock2 = mockk<BluetoothDevice>(relaxed = true)
 
