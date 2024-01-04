@@ -7,11 +7,13 @@ import com.bortxapps.simplebleclient.api.data.BleNetworkMessage
 import com.bortxapps.simplebleclient.exceptions.BleError
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
 import com.bortxapps.simplebleclient.manager.utils.launchBleOperationWithValidations
+import com.bortxapps.simplebleclient.manager.utils.mapBleConnectionState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -39,12 +41,12 @@ internal class BleManager(
 
     //region search devices
     override suspend fun getDevicesNearby(serviceUUID: UUID?, deviceName: String?) = launchBleOperationWithValidations(context) {
-        bleManagerDeviceConnection.getDevicesByService(serviceUUID, deviceName)
+        bleManagerDeviceConnection.getDevicesNearBy(serviceUUID, deviceName)
     }
 
-    override suspend fun getPairedDevicesByPrefix(context: Context, deviceNamePrefix: String) =
+    override suspend fun getPairedDevicesByPrefix(context: Context) =
         launchBleOperationWithValidations(context) {
-            bleManagerDeviceConnection.getPairedDevicesByPrefix(context, deviceNamePrefix)
+            bleManagerDeviceConnection.getPairedDevicesByPrefix(context)
         }
 
     override suspend fun stopSearchDevices() =
@@ -89,7 +91,9 @@ internal class BleManager(
         }
     }
 
-    override fun subscribeToConnectionStatusChanges() = bleManagerGattCallBacks.subscribeToConnectionStatusChanges()
+    override fun subscribeToConnectionStatusChanges() = bleManagerGattCallBacks.subscribeToConnectionStatusChanges().map {
+        mapBleConnectionState(it)
+    }
     //endregion
 
     //region IO

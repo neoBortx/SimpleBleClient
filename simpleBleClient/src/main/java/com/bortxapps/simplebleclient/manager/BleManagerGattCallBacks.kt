@@ -15,7 +15,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.UUID
 import java.util.concurrent.CancellationException
 
-internal class BleManagerGattCallBacks(bleMessageProcessorProvider: BleMessageProcessorProvider) : BluetoothGattCallback() {
+internal class BleManagerGattCallBacks(bleConfiguration: BleConfiguration, bleMessageProcessorProvider: BleMessageProcessorProvider) :
+    BluetoothGattCallback() {
 
     //region completions
     private var onConnectionEstablishedDeferred: CompletableDeferred<Boolean>? = null
@@ -26,7 +27,10 @@ internal class BleManagerGattCallBacks(bleMessageProcessorProvider: BleMessagePr
     //endregion
 
     private var connectionStatus: MutableStateFlow<Int> = MutableStateFlow(BluetoothProfile.STATE_DISCONNECTED)
-    private var incomeMessages: MutableSharedFlow<BleNetworkMessage> = MutableSharedFlow()
+    private var incomeMessages: MutableSharedFlow<BleNetworkMessage> = MutableSharedFlow(
+        replay = bleConfiguration.messageBufferRetries,
+        extraBufferCapacity = bleConfiguration.messageBufferSize
+    )
 
     private var bleMessageProcessor: BleNetworkMessageProcessor = bleMessageProcessorProvider.getMessageProcessor()
 
@@ -117,11 +121,9 @@ internal class BleManagerGattCallBacks(bleMessageProcessorProvider: BleMessagePr
     }
 
     private fun processCharacteristic(uuid: UUID, value: ByteArray) {
-
-        incomeMessages.tryEmit(BleNetworkMessage(uuid, value))
-
         bleMessageProcessor.processMessage(uuid, value)
         if (bleMessageProcessor.isFullyReceived()) {
+            incomeMessages.tryEmit(BleNetworkMessage(uuid, value))
             onDataReadDeferred?.complete(bleMessageProcessor.getPacket())
         }
     }

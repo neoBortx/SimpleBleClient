@@ -51,7 +51,7 @@ internal class BleLibraryContainer {
             blueToothScanner, BleDeviceScannerSettingsBuilder(), BleDeviceScannerFilterBuilder(), BleDeviceScannerCallbackBuilder(), bleConfiguration
         )
 
-        bleManagerGattCallBacks = BleManagerGattCallBacks(bleMessageProcessorProvider)
+        bleManagerGattCallBacks = BleManagerGattCallBacks(bleConfiguration, bleMessageProcessorProvider)
 
         bleManagerDeviceSearchOperations = BleManagerDeviceSearchOperations(bleDeviceScannerManager)
 

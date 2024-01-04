@@ -66,7 +66,7 @@ internal class BleManagerGattWriteOperationsTest {
         }
         bleMessageProcessorProvider = BleMessageProcessorProvider(bleConfiguration)
 
-        bleManagerGattCallBacks = spyk(BleManagerGattCallBacks(bleMessageProcessorProvider))
+        bleManagerGattCallBacks = spyk(BleManagerGattCallBacks(bleConfiguration, bleMessageProcessorProvider))
         bleManagerGattWriteOperations = spyk(
             BleManagerGattWriteOperations(
                 bleManagerGattCallBacks,

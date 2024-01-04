@@ -73,7 +73,7 @@ internal class BleManagerGattSubscriptionsTest {
             messageProcessor = bleNetworkMessageProcessor
         }
         bleMessageProcessorProvider = BleMessageProcessorProvider(bleConfiguration)
-        bleManagerGattCallBacks = spyk(BleManagerGattCallBacks(bleMessageProcessorProvider))
+        bleManagerGattCallBacks = spyk(BleManagerGattCallBacks(bleConfiguration, bleMessageProcessorProvider))
         bleManagerGattSubscriptions = spyk(
             BleManagerGattSubscriptions(
                 bleManagerGattCallBacks,

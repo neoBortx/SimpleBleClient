@@ -47,7 +47,7 @@ internal class BleManagerGattCallBacksTest {
         }
         bleMessageProcessorProvider = BleMessageProcessorProvider(bleConfiguration)
 
-        bleManagerGattCallBacks = BleManagerGattCallBacks(bleMessageProcessorProvider)
+        bleManagerGattCallBacks = BleManagerGattCallBacks(bleConfiguration, bleMessageProcessorProvider)
         coEvery { bluetoothGattCharacteristicMock.uuid } returns characteristicUUID
     }
 
@@ -350,5 +350,61 @@ internal class BleManagerGattCallBacksTest {
     @Test
     fun reset_whenNonInitialized_expectJustRuns() = runTest {
         bleManagerGattCallBacks.reset()
+    }
+
+    @Test
+    fun subscribeToIncomeMessages_onCharacteristicReads_is_updated_with_income_messages() = runTest {
+        launch {
+            val uuid = UUID.randomUUID()
+            coEvery { bluetoothGattCharacteristicMock.uuid } returns uuid
+            bleManagerGattCallBacks.subscribeToIncomeMessages().test {
+                bleManagerGattCallBacks.onCharacteristicRead(bluetoothGattMock, bluetoothGattCharacteristicMock, value, BluetoothGatt.GATT_SUCCESS)
+                val res = awaitItem()
+                assertEquals(uuid, res.characteristicsId)
+                assertEquals(value, res.data)
+            }
+        }
+    }
+
+    @Test
+    fun subscribeToIncomeMessages_onCharacteristicChanged_is_updated_with_income_messages() = runTest {
+        launch {
+            val uuid = UUID.randomUUID()
+            coEvery { bluetoothGattCharacteristicMock.uuid } returns uuid
+            bleManagerGattCallBacks.subscribeToIncomeMessages().test {
+                bleManagerGattCallBacks.onCharacteristicChanged(bluetoothGattMock, bluetoothGattCharacteristicMock, value)
+                val res = awaitItem()
+                assertEquals(uuid, res.characteristicsId)
+                assertEquals(value, res.data)
+            }
+        }
+    }
+
+    @Test
+    fun subscribeToIncomeMessages_onCharacteristicChanged_bufferOverflow_messages_old_messages_dropped() = runTest {
+        launch {
+            val uuid = UUID.randomUUID()
+            val uuid2 = UUID.randomUUID()
+            val uuid3 = UUID.randomUUID()
+            val uuid4 = UUID.randomUUID()
+            val uuid5 = UUID.randomUUID()
+            coEvery { bluetoothGattCharacteristicMock.uuid } returns uuid
+
+            bleManagerGattCallBacks.onCharacteristicChanged(bluetoothGattMock, bluetoothGattCharacteristicMock, value)
+            coEvery { bluetoothGattCharacteristicMock.uuid } returns uuid2
+            bleManagerGattCallBacks.onCharacteristicChanged(bluetoothGattMock, bluetoothGattCharacteristicMock, value)
+            coEvery { bluetoothGattCharacteristicMock.uuid } returns uuid3
+            bleManagerGattCallBacks.onCharacteristicChanged(bluetoothGattMock, bluetoothGattCharacteristicMock, value)
+            coEvery { bluetoothGattCharacteristicMock.uuid } returns uuid4
+            bleManagerGattCallBacks.onCharacteristicChanged(bluetoothGattMock, bluetoothGattCharacteristicMock, value)
+            coEvery { bluetoothGattCharacteristicMock.uuid } returns uuid5
+            bleManagerGattCallBacks.onCharacteristicChanged(bluetoothGattMock, bluetoothGattCharacteristicMock, value)
+
+            bleManagerGattCallBacks.subscribeToIncomeMessages().test {
+                val res = awaitItem()
+                assertEquals(uuid5, res.characteristicsId)
+                assertEquals(value, res.data)
+            }
+        }
     }
 }

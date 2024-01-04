@@ -30,17 +30,15 @@ public interface SimpleBleClientDeviceSeeker {
     public suspend fun getDevicesNearby(serviceUUID: UUID? = null, deviceName: String? = null): Flow<BluetoothDevice>
 
     /**
-     * TODO erase before release or make generic
      *
-     * Retrieves a list of BLE devices that are already paired to the device and whose name starts with the specified
-     * prefix.
+     * Retrieves a list of BLE devices that are already paired to the device
      *
      * @return A flow of [BluetoothDevice] instances that offer the specified service.
      *
      * @throws SimpleBleClientException Thrown when an error occurs during the BLE operation.
      */
 
-    public suspend fun getPairedDevicesByPrefix(context: Context, deviceNamePrefix: String): List<BluetoothDevice>
+    public suspend fun getPairedDevicesByPrefix(context: Context): List<BluetoothDevice>
 
     /**
      * Stops the ongoing search for BLE devices.
