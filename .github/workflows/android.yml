@@ -1,4 +1,4 @@
-name: Quality gates validations
+name: Android CI
 
 on:
   push:
@@ -8,26 +8,22 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
-    - name: set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: gradle
+      - name: Check out code
+        uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+          cache: gradle
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Klint validations
-      run: ./gradlew ktlintCheck
-    - name: Deteckt validations
-      run: ./gradlew detektMain
-    - name: Build with Gradle
-      run: ./gradlew build
-    - name: Unit tests
-      run: ./gradlew testReleaseUnitTest
-      
+      - name: Compile the project
+        run: ./gradlew assembleDebug
+      - name: Run unit tests
+        run: ./gradlew test
+      - name: Run KLint
+        run: ./gradlew ktlintCheck
+      - name: Run Detekt
+        run: ./gradlew detekt
