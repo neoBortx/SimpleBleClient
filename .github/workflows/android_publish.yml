@@ -1,0 +1,63 @@
+name: Android publish
+
+on:
+  push:
+    tags:
+      - 'v:??:??:??'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+
+      - name: Decode Keystore
+        run: echo ${{ secrets.ENCODED_KEYSTORE }} | base64 -d > /path/to/your_keystore.jks
+        env:
+          ENCODED_KEYSTORE: ${{ secrets.ENCODED_KEYSTORE }}
+          KEYSTORE_PATH: ${{ secrets.KEYSTORE_PATH }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+
+      - name: Extract Library Version
+        id: version
+        run: |
+          VERSION=$(./gradlew -q printVersionName)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "::set-output name=version::$VERSION"
+
+      - name: Build and Sign AAR
+        run: ./gradlew assembleRelease
+
+      - name: Decode Keystore
+        run: echo ${{ secrets.ENCODED_KEYSTORE }} | base64 -d > bortxappskeystore.p12
+        # This step should generate the AAR file with version in its name
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./simpleBleClient/build/outputs/aar/simpleBleClient-${{ steps.version.outputs.version }}.aar
+          asset_name: simpleBleClient-${{ steps.version.outputs.version }}.aar
+          asset_content_type: application/zip
