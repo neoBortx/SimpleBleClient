@@ -23,6 +23,8 @@ jobs:
         run: ./gradlew assembleDebug
       - name: Run unit tests
         run: ./gradlew test
+      - name: Android Test Report
+        uses: asadmansr/android-test-report-action@v1.2.0
       - name: Run KLint
         run: ./gradlew ktlintCheck
       - name: Run Detekt
