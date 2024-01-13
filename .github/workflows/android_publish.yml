@@ -20,7 +20,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Decode Keystore
-        run: pwd; echo ${{ secrets.ENCODED_KEYSTORE }} | base64 -d > ${{ secrets.KEYSTORE_PATH }}
+        run: pwd; echo ${{ secrets.ENCODED_KEYSTORE }} | base64 -d > bortxappskeystore.p12
         env:
           ENCODED_KEYSTORE: ${{ secrets.ENCODED_KEYSTORE }}
           KEYSTORE_PATH: ${{ secrets.KEYSTORE_PATH }}
@@ -36,10 +36,6 @@ jobs:
 
       - name: Build and Sign AAR
         run: ./gradlew assembleRelease
-
-      - name: Decode Keystore
-        run: echo ${{ secrets.ENCODED_KEYSTORE }} | base64 -d > bortxappskeystore.p12
-        # This step should generate the AAR file with version in its name
 
       - name: Create Release
         id: create_release
