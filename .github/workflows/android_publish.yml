@@ -20,7 +20,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Decode Keystore
-        run: echo ${{ secrets.ENCODED_KEYSTORE }} | base64 -d > /path/to/your_keystore.jks
+        run: echo ${{ secrets.ENCODED_KEYSTORE }} | base64 -d > ${{ secrets.KEYSTORE_PATH }}
         env:
           ENCODED_KEYSTORE: ${{ secrets.ENCODED_KEYSTORE }}
           KEYSTORE_PATH: ${{ secrets.KEYSTORE_PATH }}
