@@ -19,9 +19,6 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
 
-      - name: Decode Keystore
-        run: pwd; echo ${{ secrets.ENCODED_KEYSTORE }} | base64 -d > bortxappskeystore.p12
-
       - name: Set up env variables
         run: |
           echo "ENCODED_KEYSTORE=${{ secrets.ENCODED_KEYSTORE }}" >> $GITHUB_ENV
@@ -29,6 +26,13 @@ jobs:
           echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
           echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
           echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+
+      - name: Get release artifact name
+        run: |
+          echo "RELEASE_ARTIFACT=$(./gradlew printReleaseArtifactName)" >> $GITHUB_ENV
+
+      - name: Decode Keystore
+        run: pwd; echo ${{ secrets.ENCODED_KEYSTORE }} | base64 -d > bortxappskeystore.p12
 
       - name: Build and Sign AAR
         run: ./gradlew assembleRelease
@@ -41,11 +45,6 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
-
-      - name: Get release artifact name
-        id: version
-        run: |
-          echo "RELEASE_ARTIFACT=$(./gradlew printReleaseArtifactName)" >> $GITHUB_ENV
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
