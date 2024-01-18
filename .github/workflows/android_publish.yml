@@ -19,6 +19,14 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
 
+      - name: Cache Gradle and wrapper
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+
       - name: Set up env variables
         run: |
           echo "RELEASE_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
@@ -35,19 +43,17 @@ jobs:
       - name: Build and Sign AAR
         run: ./gradlew assembleRelease
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Upload Release Build to Artifacts
+        uses: actions/upload-artifact@v3
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
+          name: release-artifacts
+          paths: |
+            simpleBleClient/build/outputs/aar/
 
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
+      - name: Create Github Release
+        uses: softprops/action-gh-release@v1
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/outputs/aar/${{ env.RELEASE_ARTIFACT}}
-          asset_name: ${{ env.RELEASE_ARTIFACT }}
-          asset_content_type: application/zip
+          generate_release_notes: true
+          prerelease: true
+          files: |
+            simpleBleClient/build/outputs/aar/${{ env.RELEASE_ARTIFACT }}

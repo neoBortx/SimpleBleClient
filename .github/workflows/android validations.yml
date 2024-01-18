@@ -19,6 +19,14 @@ jobs:
           distribution: 'adopt'
           cache: gradle
 
+      - name: Cache Gradle and wrapper
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+
       - name: Compile the project
         run: ./gradlew assembleDebug
       - name: Run unit tests
