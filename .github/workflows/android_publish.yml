@@ -31,6 +31,7 @@ jobs:
         run: |
           echo "RELEASE_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
           echo "RELEASE_ARTIFACT=simpleBleClient_release_${GITHUB_REF#refs/tags/v}.aar" >> $GITHUB_ENV
+          echo "DEBUG_ARTIFACT=simpleBleClient_release_${GITHUB_REF#refs/tags/v}.aar" >> $GITHUB_ENV
           echo "KEYSTORE_PATH=${{ secrets.KEYSTORE_PATH }}" >> $GITHUB_ENV
           echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
           echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
@@ -42,17 +43,13 @@ jobs:
       - name: Build and Sign AAR
         run: ./gradlew assembleRelease
 
-      - name: Upload Release Build to Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.RELEASE_ARTIFACT }}
-          retention-days: 1
-          path: simpleBleClient/build/outputs/aar/${{ env.RELEASE_ARTIFACT }}
-
       - name: Create Github Release
         uses: softprops/action-gh-release@v1
         with:
           generate_release_notes: true
           prerelease: true
+          draft: false
           files: |
             simpleBleClient/build/outputs/aar/${{ env.RELEASE_ARTIFACT }}
+            simpleBleClient/build/outputs/aar/${{ env.DEBUG_ARTIFACT }}
+            LICENSE
