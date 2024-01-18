@@ -33,3 +33,20 @@ jobs:
 
       - name: Build and Sign AAR
         run: ./gradlew assembleRelease
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./simpleBleClient/build/outputs/aar/simpleBleClient-${{ steps.version.outputs.version }}.aar
+          asset_name: simpleBleClient-${{ steps.version.outputs.version }}.aar
+          asset_content_type: application/zip
