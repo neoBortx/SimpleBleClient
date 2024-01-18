@@ -42,15 +42,15 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Extract Library Version
+      - name: Get release artifact name
         id: version
         run: |
-          echo "VERSION=$(./gradlew -q printVersionName)" >> $GITHUB_ENV
+          echo "RELEASE_ARTIFACT=$(./gradlew printReleaseArtifactName)" >> $GITHUB_ENV
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./simpleBleClient/build/outputs/aar/simpleBleClient-${VERSION}.aar
-          asset_name: simpleBleClient-${{ steps.version.outputs.version }}.aar
+          asset_path: ./simpleBleClient/build/outputs/aar/${RELEASE_ARTIFACT}
+          asset_name: ${RELEASE_ARTIFACT}
           asset_content_type: application/zip
