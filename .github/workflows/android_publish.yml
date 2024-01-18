@@ -44,11 +44,11 @@ jobs:
         run: ./gradlew assembleRelease
 
       - name: Upload Release Build to Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: release-artifacts
-          paths: |
-            simpleBleClient/build/outputs/aar/
+          name: ${{ env.RELEASE_ARTIFACT }}
+          retention-days: 1
+          path: simpleBleClient/build/outputs/aar/${{ env.RELEASE_ARTIFACT }}
 
       - name: Create Github Release
         uses: softprops/action-gh-release@v1
