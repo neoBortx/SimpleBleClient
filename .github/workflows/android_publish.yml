@@ -31,11 +31,5 @@ jobs:
           echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
           echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
 
-      - name: Extract Library Version
-        id: version
-        run: |
-          VERSION=$(./gradlew -q printVersionName)
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-
       - name: Build and Sign AAR
         run: ./gradlew assembleRelease
