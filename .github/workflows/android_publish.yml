@@ -48,6 +48,6 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./simpleBleClient/build/outputs/aar/${{ env.RELEASE_ARTIFACT}}
+          asset_path: ./build/outputs/aar/${{ env.RELEASE_ARTIFACT}}
           asset_name: ${{ env.RELEASE_ARTIFACT }}
           asset_content_type: application/zip
