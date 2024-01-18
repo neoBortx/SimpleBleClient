@@ -44,9 +44,9 @@ internal class BleManager(
         bleManagerDeviceConnection.getDevicesNearBy(serviceUUID, deviceName)
     }
 
-    override suspend fun getPairedDevicesByPrefix(context: Context) =
+    override suspend fun getPairedDevices(context: Context) =
         launchBleOperationWithValidations(context) {
-            bleManagerDeviceConnection.getPairedDevicesByPrefix(context)
+            bleManagerDeviceConnection.getPairedDevices(context)
         }
 
     override suspend fun stopSearchDevices() =

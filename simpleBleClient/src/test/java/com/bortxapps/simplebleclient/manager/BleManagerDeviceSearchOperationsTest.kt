@@ -101,13 +101,13 @@ internal class BleManagerDeviceSearchOperationsTest {
     }
     //endregion
 
-    //region getPairedDevicesByPrefix
+    //region getPairedDevices
     @Test
     fun testGetPairedDevicesByPrefix() = runTest {
         every { contextMock.getSystemService(BluetoothManager::class.java) } returns bluetoothManagerMock
         every { bluetoothAdapterMock.bondedDevices } returns setOf(bluetoothDeviceMock, bluetoothDeviceMock2)
 
-        val result = bleManagerDeviceConnection.getPairedDevicesByPrefix(contextMock)
+        val result = bleManagerDeviceConnection.getPairedDevices(contextMock)
 
         TestCase.assertEquals(2, result.size)
         TestCase.assertEquals(bluetoothDeviceMock, result.first())
@@ -118,7 +118,7 @@ internal class BleManagerDeviceSearchOperationsTest {
         every { contextMock.getSystemService(BluetoothManager::class.java) } returns bluetoothManagerMock
         every { bluetoothAdapterMock.bondedDevices } returns setOf()
 
-        val result = bleManagerDeviceConnection.getPairedDevicesByPrefix(contextMock)
+        val result = bleManagerDeviceConnection.getPairedDevices(contextMock)
 
         Assert.assertTrue(result.isEmpty())
     }
@@ -128,7 +128,7 @@ internal class BleManagerDeviceSearchOperationsTest {
         every { contextMock.getSystemService(BluetoothManager::class.java) } returns null
         every { bluetoothAdapterMock.bondedDevices } returns setOf(bluetoothDeviceMock, bluetoothDeviceMock2)
 
-        val result = bleManagerDeviceConnection.getPairedDevicesByPrefix(contextMock)
+        val result = bleManagerDeviceConnection.getPairedDevices(contextMock)
 
         Assert.assertTrue(result.isEmpty())
     }
@@ -139,7 +139,7 @@ internal class BleManagerDeviceSearchOperationsTest {
         every { bluetoothManagerMock.adapter } returns null
         every { bluetoothAdapterMock.bondedDevices } returns setOf(bluetoothDeviceMock, bluetoothDeviceMock2)
 
-        val result = bleManagerDeviceConnection.getPairedDevicesByPrefix(contextMock)
+        val result = bleManagerDeviceConnection.getPairedDevices(contextMock)
 
         Assert.assertTrue(result.isEmpty())
     }
@@ -149,7 +149,7 @@ internal class BleManagerDeviceSearchOperationsTest {
         every { contextMock.getSystemService(BluetoothManager::class.java) } returns bluetoothManagerMock
         every { bluetoothAdapterMock.bondedDevices } returns null
 
-        val result = bleManagerDeviceConnection.getPairedDevicesByPrefix(contextMock)
+        val result = bleManagerDeviceConnection.getPairedDevices(contextMock)
 
         Assert.assertTrue(result.isEmpty())
     }
@@ -160,7 +160,7 @@ internal class BleManagerDeviceSearchOperationsTest {
         every { bluetoothManagerMock.adapter } returns null
         every { bluetoothAdapterMock.bondedDevices } returns setOf(bluetoothDeviceMock2)
 
-        val result = bleManagerDeviceConnection.getPairedDevicesByPrefix(contextMock)
+        val result = bleManagerDeviceConnection.getPairedDevices(contextMock)
 
         Assert.assertTrue(result.isEmpty())
     }

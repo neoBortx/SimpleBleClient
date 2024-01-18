@@ -126,12 +126,12 @@ internal class BleManagerTest {
     }
 
     @Test
-    fun `getPairedDevicesByPrefix should call BleManagerDeviceSearchOperations getPairedDevicesByPrefix`() = runTest {
-        coEvery { bleManagerDeviceConnectionMock.getPairedDevicesByPrefix(contextMock) } returns listOf(bluetoothDeviceMock)
+    fun `getPairedDevices should call BleManagerDeviceSearchOperations getPairedDevicesByPrefix`() = runTest {
+        coEvery { bleManagerDeviceConnectionMock.getPairedDevices(contextMock) } returns listOf(bluetoothDeviceMock)
 
-        bleManager.getPairedDevicesByPrefix(contextMock)
+        bleManager.getPairedDevices(contextMock)
 
-        verify { bleManagerDeviceConnectionMock.getPairedDevicesByPrefix(contextMock) }
+        verify { bleManagerDeviceConnectionMock.getPairedDevices(contextMock) }
     }
     //endregion
 

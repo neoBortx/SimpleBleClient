@@ -1,6 +1,7 @@
 package com.bortxapps.simplebleclient.api
 
 import android.content.Context
+import androidx.annotation.Keep
 import com.bortxapps.simplebleclient.api.contracts.BleNetworkMessageProcessor
 import com.bortxapps.simplebleclient.api.contracts.SimpleBleClient
 import com.bortxapps.simplebleclient.di.BleLibraryContainer
@@ -40,6 +41,7 @@ import org.jetbrains.annotations.VisibleForTesting
  *     .build(context)
  *
  */
+@Keep
 public class SimpleBleClientBuilder {
     private var operationTimeOutMillisConf: Long? = null
     private var scanPeriodMillisConf: Long? = null

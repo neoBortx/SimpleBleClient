@@ -4,10 +4,12 @@ package com.bortxapps.simplebleclient.api.contracts
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
+import androidx.annotation.Keep
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
+@Keep
 public interface SimpleBleClientDeviceSeeker {
     /**
      * Retrieves a flow of BLE devices that offers a specified service. This operation has a timeout of 10 seconds by default.
@@ -38,7 +40,7 @@ public interface SimpleBleClientDeviceSeeker {
      * @throws SimpleBleClientException Thrown when an error occurs during the BLE operation.
      */
 
-    public suspend fun getPairedDevicesByPrefix(context: Context): List<BluetoothDevice>
+    public suspend fun getPairedDevices(context: Context): List<BluetoothDevice>
 
     /**
      * Stops the ongoing search for BLE devices.

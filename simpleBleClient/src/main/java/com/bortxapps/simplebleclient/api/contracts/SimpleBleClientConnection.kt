@@ -1,10 +1,12 @@
 package com.bortxapps.simplebleclient.api.contracts
 
 import android.content.Context
+import androidx.annotation.Keep
 import com.bortxapps.simplebleclient.api.data.BleConnectionStatus
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
 import kotlinx.coroutines.flow.Flow
 
+@Keep
 public interface SimpleBleClientConnection {
 
     /**

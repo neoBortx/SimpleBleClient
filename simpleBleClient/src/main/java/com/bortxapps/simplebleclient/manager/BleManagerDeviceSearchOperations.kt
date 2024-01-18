@@ -35,7 +35,7 @@ internal class BleManagerDeviceSearchOperations(
     }
 
     @SuppressLint("MissingPermission")
-    fun getPairedDevicesByPrefix(context: Context): List<BluetoothDevice> =
+    fun getPairedDevices(context: Context): List<BluetoothDevice> =
         context.getSystemService(BluetoothManager::class.java)
             ?.adapter
             ?.bondedDevices
