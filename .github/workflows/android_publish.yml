@@ -27,14 +27,17 @@ jobs:
         run: |
           VERSION=$(./gradlew -q printVersionName)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "::set-output name=version::$VERSION"
+
+      - name: Set up env variables
+        run: |
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "ENCODED_KEYSTORE=${{ secrets.ENCODED_KEYSTORE }}" >> $GITHUB_ENV
+          echo "KEYSTORE_PATH=${{ secrets.KEYSTORE_PATH }}" >> $GITHUB_ENV
+          echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
+          echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
+          
 
       - name: Build and Sign AAR
-        env:
-          ENCODED_KEYSTORE: ${{ secrets.ENCODED_KEYSTORE }}
-          KEYSTORE_PATH: ${{ secrets.KEYSTORE_PATH }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         run: ./gradlew assembleRelease
 
       - name: Create Release
