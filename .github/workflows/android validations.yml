@@ -23,8 +23,14 @@ jobs:
         run: ./gradlew assembleDebug
       - name: Run unit tests
         run: ./gradlew test
-      - name: Android Test Report
-        uses: asadmansr/android-test-report-action@v1.2.0
+      - name: Store reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: reports
+          path: |
+            **/build/reports/
+            **/build/test-results/
       - name: Run KLint
         run: ./gradlew ktlintCheck
       - name: Run Detekt
