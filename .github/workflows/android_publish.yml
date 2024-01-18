@@ -36,12 +36,17 @@ jobs:
           echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
           echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
           echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+          echo GPR_USER=${{ github.actor }} >> $GITHUB_ENV
+          echo GPR_KEY=${{ secrets.GITHUB_TOKEN }} >> $GITHUB_ENV
 
       - name: Decode Keystore
         run: pwd; echo ${{ secrets.ENCODED_KEYSTORE }} | base64 -d > ${{ secrets.KEYSTORE_NAME }}
 
-      - name: Build and Sign AAR
+      - name: Build and Sign release AAR
         run: ./gradlew assembleRelease
+
+      - name: Build debug AAR
+        run: ./gradlew assembleDebug
 
       - name: Create Github Release
         uses: softprops/action-gh-release@v1
@@ -53,3 +58,6 @@ jobs:
             simpleBleClient/build/outputs/aar/${{ env.RELEASE_ARTIFACT }}
             simpleBleClient/build/outputs/aar/${{ env.DEBUG_ARTIFACT }}
             LICENSE
+
+      - name: Publish to GitHub Packages
+        run: bash ./gradlew publish
