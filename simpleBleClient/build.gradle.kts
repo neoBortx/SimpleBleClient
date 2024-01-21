@@ -68,6 +68,8 @@ publishing {
                 from(components["release"])
             }
 
+            artifact("$buildDir/outputs/aar/simplebleclient_$versionLib.aar")
+
             pom {
                 name = "Simple BLE Client"
                 description = "A simple BLE client library for Android that works with coroutines"
@@ -109,7 +111,7 @@ dependencies {
 
 tasks.register("printReleaseArtifactName") {
     doLast {
-        println("simpleBleClient_release_$versionLib.aar")
+        println("simpleBleClient_$versionLib.aar")
     }
 }
 
