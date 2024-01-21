@@ -58,6 +58,3 @@ jobs:
             simpleBleClient/build/outputs/aar/${{ env.RELEASE_ARTIFACT }}
             simpleBleClient/build/outputs/aar/${{ env.DEBUG_ARTIFACT }}
             LICENSE
-
-      - name: Publish to GitHub Packages
-        run: bash ./gradlew publish

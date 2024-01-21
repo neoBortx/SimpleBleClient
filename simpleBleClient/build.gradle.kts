@@ -54,41 +54,14 @@ android {
                 }
             }
     }
-}
 
-publishing {
-    publications {
-        register<MavenPublication>("release") {
-            groupId = "com.neobortx"
-            artifactId = "simplebleclient"
-            version = "$versionLib"
-            description = "A simple BLE client library for Android that works with coroutines"
-
-            afterEvaluate {
-                from(components["release"])
-            }
-
-            artifact("$buildDir/outputs/aar/simplebleclient_$versionLib.aar")
-
-            pom {
-                name = "Simple BLE Client"
-                description = "A simple BLE client library for Android that works with coroutines"
-                url = "https://github.com/neoBortx/SimpleBleClient"
-                licenses {
-                    license {
-                        name.set("MIT License")
-                        url.set("http://www.opensource.org/licenses/mit-license.php")
-                    }
-                }
-            }
-        }
-        repositories {
-            mavenLocal()
-            maven {
-                url = uri("https://jitpack.io")
-            }
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
         }
     }
+
 }
 
 detekt {
@@ -107,6 +80,21 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)
     testImplementation(libs.kotlinx.coroutines.test)
+}
+
+publishing {
+    publications {
+        register<MavenPublication>("release") {
+            groupId = "com.neobortx"
+            artifactId = "simplebleclient"
+            version = "$versionLib"
+            description = "A simple BLE client library for Android that works with coroutines"
+
+            afterEvaluate {
+                from(components["release"])
+            }
+        }
+    }
 }
 
 tasks.register("printReleaseArtifactName") {

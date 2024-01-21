@@ -1,9 +1,2 @@
 jdk:
   - openjdk17
-
-before_install:
-  - echo "Using OpenJDK 17 and Gradle 8.2"
-
-install:
-  - ./gradlew wrapper --gradle-version=8.2
-  - ./gradlew clean build
