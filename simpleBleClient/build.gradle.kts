@@ -12,7 +12,7 @@ val versionLib = project.property("VERSION_LIB")
 android {
 
     namespace = "com.bortxapps.simplebleclient"
-    compileSdk = 33
+    compileSdk = 34
     version = "$versionLib"
 
     defaultConfig {
@@ -47,20 +47,26 @@ android {
         variant.outputs
             .map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
             .forEach { output ->
-                val outputFileName = "simpleBleClient_${output.name}_$versionLib.aar"
-                output.outputFileName = outputFileName
+                if (output.name.contains("release")) {
+                    output.outputFileName = "simplebleclient_$versionLib.aar"
+                } else {
+                    output.outputFileName = "simplebleclient_debug_$versionLib.aar"
+                }
             }
     }
 }
 
 publishing {
     publications {
-        create<MavenPublication>("maven") {
+        register<MavenPublication>("release") {
             groupId = "com.neobortx"
             artifactId = "simplebleclient"
             version = "$versionLib"
-            artifact("$buildDir/outputs/aar/simpleBleClient_release_$versionLib.aar")
             description = "A simple BLE client library for Android that works with coroutines"
+
+            afterEvaluate {
+                from(components["release"])
+            }
 
             pom {
                 name = "Simple BLE Client"
