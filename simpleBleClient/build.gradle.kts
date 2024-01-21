@@ -13,6 +13,7 @@ android {
 
     namespace = "com.bortxapps.simplebleclient"
     compileSdk = 33
+    version = "$versionLib"
 
     defaultConfig {
         minSdk = 26
@@ -22,7 +23,7 @@ android {
 
     buildTypes {
         debug {
-            version = "$versionLib-alpha01-debug"
+            version = "$versionLib-debug"
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
