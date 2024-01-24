@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.annotation.Keep
 import com.bortxapps.simplebleclient.api.contracts.BleNetworkMessageProcessor
 import com.bortxapps.simplebleclient.api.contracts.SimpleBleClient
+import com.bortxapps.simplebleclient.api.impl.SimpleBleClientFactory
 import com.bortxapps.simplebleclient.di.BleLibraryContainer
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
-import com.bortxapps.simplebleclient.manager.BleManager
 import org.jetbrains.annotations.VisibleForTesting
 
 /**
@@ -83,15 +83,15 @@ public class SimpleBleClientBuilder {
         }
 
         with(bleLibraryContainer) {
-            return BleManager(
-                getBleManagerDeviceSearchOperations(),
+            return SimpleBleClientFactory(
+                context.applicationContext,
+                getBleManagerGattCallBacks(),
                 getBleManagerGattConnectionOperations(),
-                getBleManagerGattSubscriptions(),
                 getBleManagerGattReadOperations(),
                 getBleManagerGattWriteOperations(),
-                getBleManagerGattCallBacks(),
-                context.applicationContext
-            )
+                getBleManagerGattSubscriptions(),
+                getBleManagerDeviceSearchOperations()
+            ).create()
         }
     }
 }

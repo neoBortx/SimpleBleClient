@@ -22,14 +22,32 @@ internal class BleManagerGattWriteOperations(
 ) : BleManagerGattOperationBase(gattMutex, bleConfiguration) {
 
     //region send data
-    suspend fun sendData(
+    suspend fun sendDataWithResponse(
         serviceUUID: UUID,
         characteristicUUID: UUID,
         data: ByteArray,
         bluetoothGatt: BluetoothGatt
     ): BleNetworkMessage {
         bluetoothGatt.getService(serviceUUID)?.getCharacteristic(characteristicUUID)?.let {
-            return writeCharacteristic(
+            return writeCharacteristicWithResponse(
+                bluetoothGatt,
+                data,
+                it
+            )
+        } ?: run {
+            Log.e("BleManager", "writeCharacteristic characteristic is null")
+            throw SimpleBleClientException(BleError.SEND_COMMAND_FAILED)
+        }
+    }
+
+    suspend fun sendData(
+        serviceUUID: UUID,
+        characteristicUUID: UUID,
+        data: ByteArray,
+        bluetoothGatt: BluetoothGatt
+    ) {
+        bluetoothGatt.getService(serviceUUID)?.getCharacteristic(characteristicUUID)?.let {
+            writeCharacteristic(
                 bluetoothGatt,
                 data,
                 it
@@ -42,7 +60,7 @@ internal class BleManagerGattWriteOperations(
 
     @Suppress("DEPRECATION")
     @SuppressLint("MissingPermission", "NewApi")
-    private suspend fun writeCharacteristic(
+    private suspend fun writeCharacteristicWithResponse(
         bluetoothGatt: BluetoothGatt,
         value: ByteArray,
         characteristic: BluetoothGattCharacteristic
@@ -62,6 +80,37 @@ internal class BleManagerGattWriteOperations(
             if (res) {
                 launchDeferredOperation {
                     bleManagerGattCallBacks.waitForDataRead()
+                }
+            } else {
+                null
+            }
+        } ?: run {
+            throw SimpleBleClientException(BleError.SEND_COMMAND_FAILED)
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    @SuppressLint("MissingPermission", "NewApi")
+    private suspend fun writeCharacteristic(
+        bluetoothGatt: BluetoothGatt,
+        value: ByteArray,
+        characteristic: BluetoothGattCharacteristic
+    ) {
+        launchGattOperation {
+            bleManagerGattCallBacks.initDeferredWriteOperation()
+            val res = if (buildVersionProvider.getSdkVersion() >= Build.VERSION_CODES.TIRAMISU) {
+                bluetoothGatt.writeCharacteristic(
+                    characteristic,
+                    value,
+                    BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+                ) == BluetoothStatusCodes.SUCCESS
+            } else {
+                bluetoothGatt.writeCharacteristic(characteristic.apply { this.value = value })
+            }
+
+            if (res) {
+                launchDeferredOperation {
+                    bleManagerGattCallBacks.waitForDataWrite()
                 }
             } else {
                 null

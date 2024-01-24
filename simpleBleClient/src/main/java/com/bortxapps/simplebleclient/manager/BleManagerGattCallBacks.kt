@@ -21,6 +21,7 @@ internal class BleManagerGattCallBacks(bleConfiguration: BleConfiguration, bleMe
     //region completions
     private var onConnectionEstablishedDeferred: CompletableDeferred<Boolean>? = null
     private var onDataReadDeferred: CompletableDeferred<BleNetworkMessage>? = null
+    private var onDataWriteDeferred: CompletableDeferred<Boolean>? = null
     private var onDescriptorWriteDeferred: CompletableDeferred<Boolean>? = null
     private var onDisconnectedDeferred: CompletableDeferred<Boolean>? = null
     private var onServicesDiscoveredDeferred: CompletableDeferred<Boolean>? = null
@@ -89,6 +90,19 @@ internal class BleManagerGattCallBacks(bleConfiguration: BleConfiguration, bleMe
         }
     }
 
+    override fun onCharacteristicWrite(
+        gatt: BluetoothGatt?,
+        characteristic: BluetoothGattCharacteristic?,
+        status: Int
+    ) {
+        if (status == BluetoothGatt.GATT_SUCCESS) {
+            onDataWriteDeferred?.complete(true)
+        } else {
+            Log.e("BleManagerGattCallBacks", "onCharacteristicWrite: FAIL - status $status")
+            onDataWriteDeferred?.cancel(CancellationException("Gatt Write operation failed -> gat code $status"))
+        }
+    }
+
     override fun onCharacteristicChanged(
         gatt: BluetoothGatt,
         characteristic: BluetoothGattCharacteristic,
@@ -132,6 +146,8 @@ internal class BleManagerGattCallBacks(bleConfiguration: BleConfiguration, bleMe
         onConnectionEstablishedDeferred = null
         onDataReadDeferred?.cancel()
         onDataReadDeferred = null
+        onDataWriteDeferred?.cancel()
+        onDataWriteDeferred = null
         onDescriptorWriteDeferred?.cancel()
         onDescriptorWriteDeferred = null
         onDisconnectedDeferred?.cancel()
@@ -151,6 +167,10 @@ internal class BleManagerGattCallBacks(bleConfiguration: BleConfiguration, bleMe
 
     internal fun initDeferredReadOperation() {
         onDataReadDeferred = CompletableDeferred()
+    }
+
+    internal fun initDeferredWriteOperation() {
+        onDataWriteDeferred = CompletableDeferred()
     }
 
     internal fun initDeferredWriteDescriptorOperation() {
@@ -175,6 +195,11 @@ internal class BleManagerGattCallBacks(bleConfiguration: BleConfiguration, bleMe
     internal suspend fun waitForDataRead() = onDataReadDeferred?.await()
         ?: throw UninitializedPropertyAccessException(
             "onDataReadDeferred is null, you must call initReadOperation() first"
+        )
+
+    internal suspend fun waitForDataWrite() = onDataWriteDeferred?.await()
+        ?: throw UninitializedPropertyAccessException(
+            "onDataWriteDeferred is null, you must call initWriteOperation() first"
         )
 
     internal suspend fun waitForWrittenDescriptor() = onDescriptorWriteDeferred?.await()

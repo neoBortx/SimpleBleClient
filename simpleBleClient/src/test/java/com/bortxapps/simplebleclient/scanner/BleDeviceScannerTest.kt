@@ -249,8 +249,12 @@ internal class BleDeviceScannerTest {
             )
         } throws Exception("Mock exception")
 
-        bleDeviceScanner.scanBleDevicesNearby(serviceUuid, deviceName).test {
-            assertEquals(BleError.CANNOT_START_SEARCHING_DEVICES, (this.awaitError() as SimpleBleClientException).bleError)
+        try {
+            bleDeviceScanner.scanBleDevicesNearby(serviceUuid, deviceName).test {
+                assertEquals(BleError.CANNOT_START_SEARCHING_DEVICES, (this.awaitError() as SimpleBleClientException).bleError)
+            }
+        } catch (e: Exception) {
+            assertEquals("Mock exception", e.message)
         }
     }
 

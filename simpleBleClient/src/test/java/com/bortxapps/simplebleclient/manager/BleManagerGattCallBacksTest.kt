@@ -52,7 +52,7 @@ internal class BleManagerGattCallBacksTest {
     }
 
     @Test
-    fun subscribeToConnectionStatusChanges_onConnectionStateChangeInvoked_expectStateUpdated() = runTest {
+    fun `subscribeToConnectionStatusChanges onConnectionStateChangeInvoked expectStateUpdated`() = runTest {
         launch {
             bleManagerGattCallBacks.subscribeToConnectionStatusChanges().test {
                 assertEquals(BluetoothProfile.STATE_DISCONNECTED, awaitItem())
@@ -72,7 +72,7 @@ internal class BleManagerGattCallBacksTest {
     }
 
     @Test
-    fun waitForConnectionEstablished_initConnectOperation_not_called_expectException() = runTest {
+    fun `waitForConnectionEstablished initConnectOperation not called expect exception`() = runTest {
         assertThrows(UninitializedPropertyAccessException::class.java) {
             runBlocking {
                 bleManagerGattCallBacks.waitForConnectionEstablished()
@@ -81,7 +81,7 @@ internal class BleManagerGattCallBacksTest {
     }
 
     @Test
-    fun waitForDataRead_initReadOperation_not_called_expectException() = runTest {
+    fun `waitForDataRead initReadOperation not called expect exception`() = runTest {
         assertThrows(UninitializedPropertyAccessException::class.java) {
             runBlocking {
                 bleManagerGattCallBacks.waitForDataRead()
@@ -90,7 +90,16 @@ internal class BleManagerGattCallBacksTest {
     }
 
     @Test
-    fun waitForWrittenDescriptor_initWriteDescriptorOperation_not_called_expectException() = runTest {
+    fun `waitForDataWrite initRWriteOperation not called expect exception`() = runTest {
+        assertThrows(UninitializedPropertyAccessException::class.java) {
+            runBlocking {
+                bleManagerGattCallBacks.waitForDataWrite()
+            }
+        }
+    }
+
+    @Test
+    fun `waitForWrittenDescriptor initWriteDescriptorOperation not called expect exception`() = runTest {
         assertThrows(UninitializedPropertyAccessException::class.java) {
             runBlocking {
                 bleManagerGattCallBacks.waitForWrittenDescriptor()
@@ -99,7 +108,7 @@ internal class BleManagerGattCallBacksTest {
     }
 
     @Test
-    fun waitForDisconnected_initDisconnectOperation_not_called_expectException() = runTest {
+    fun `waitForDisconnected initDisconnectOperation not called expect exception`() = runTest {
         assertThrows(UninitializedPropertyAccessException::class.java) {
             runBlocking {
                 bleManagerGattCallBacks.waitForDisconnected()
@@ -108,7 +117,7 @@ internal class BleManagerGattCallBacksTest {
     }
 
     @Test
-    fun waitForServicesDiscovered_initDiscoverServicesOperation_not_called_expectException() = runTest {
+    fun `waitForServicesDiscovered initDiscoverServicesOperation not called expect exception`() = runTest {
         assertThrows(UninitializedPropertyAccessException::class.java) {
             runBlocking {
                 bleManagerGattCallBacks.waitForServicesDiscovered()
@@ -117,7 +126,7 @@ internal class BleManagerGattCallBacksTest {
     }
 
     @Test
-    fun waitForConnectionEstablished_initConnectOperation_called_expectSuccess() = runTest {
+    fun `waitForConnectionEstablished initConnectOperation called expect success`() = runTest {
         bleManagerGattCallBacks.initDeferredConnectOperation()
 
         thread {
@@ -129,7 +138,7 @@ internal class BleManagerGattCallBacksTest {
     }
 
     @Test
-    fun waitForDataRead_initReadOperation_simpleResponse_onCharacteristicRead_called_expectSuccess() = runTest {
+    fun `waitForDataRead initReadOperation simpleResponse onCharacteristicRead called expect success`() = runTest {
         coEvery { bleNetworkMessageProcessor.processMessage(characteristicUUID, value) } just runs
         coEvery { bleNetworkMessageProcessor.getPacket() } returns receivedMessage
         coEvery { bleNetworkMessageProcessor.isFullyReceived() } returns true
@@ -151,7 +160,7 @@ internal class BleManagerGattCallBacksTest {
     }
 
     @Test
-    fun waitForDataRead_initReadOperation_simpleResponse_onCharacteristicChanged_called_expectSuccess() = runTest {
+    fun `waitForDataRead initReadOperation simpleResponse onCharacteristicChanged called expect success`() = runTest {
         coEvery { bleNetworkMessageProcessor.processMessage(characteristicUUID, value) } just runs
         coEvery { bleNetworkMessageProcessor.isFullyReceived() } returns true
         coEvery { bleNetworkMessageProcessor.getPacket() } returns receivedMessage
@@ -168,7 +177,43 @@ internal class BleManagerGattCallBacksTest {
     }
 
     @Test
-    fun waitForWrittenDescriptor_initWriteDescriptorOperation_called_expectSuccess() = runTest {
+    fun `waitForDataWrite initWriteOperation onCharacteristicWrite called expect success`() = runTest {
+        coEvery { bleNetworkMessageProcessor.processMessage(characteristicUUID, value) } just runs
+        coEvery { bleNetworkMessageProcessor.isFullyReceived() } returns true
+        coEvery { bleNetworkMessageProcessor.getPacket() } returns receivedMessage
+
+        bleManagerGattCallBacks.initDeferredWriteOperation()
+
+        thread {
+            Thread.sleep(100)
+            bleManagerGattCallBacks.onCharacteristicWrite(bluetoothGattMock, bluetoothGattCharacteristicMock, BluetoothGatt.GATT_SUCCESS)
+        }
+
+        assertTrue(bleManagerGattCallBacks.waitForDataWrite())
+    }
+
+    @Test
+    fun `waitForDataWrite initWriteOperation onCharacteristicWrite throws error called expect exception`() = runTest {
+        coEvery { bleNetworkMessageProcessor.processMessage(characteristicUUID, value) } just runs
+        coEvery { bleNetworkMessageProcessor.isFullyReceived() } returns true
+        coEvery { bleNetworkMessageProcessor.getPacket() } returns receivedMessage
+
+        bleManagerGattCallBacks.initDeferredWriteOperation()
+
+        thread {
+            Thread.sleep(100)
+            bleManagerGattCallBacks.onCharacteristicWrite(bluetoothGattMock, bluetoothGattCharacteristicMock, BluetoothGatt.GATT_FAILURE)
+        }
+
+        assertThrows(CancellationException::class.java) {
+            runBlocking {
+                bleManagerGattCallBacks.waitForDataWrite()
+            }
+        }
+    }
+
+    @Test
+    fun `waitForWrittenDescriptor initWriteDescriptorOperation called expect success`() = runTest {
         bleManagerGattCallBacks.initDeferredWriteDescriptorOperation()
 
         thread {
@@ -180,7 +225,7 @@ internal class BleManagerGattCallBacksTest {
     }
 
     @Test
-    fun waitForDisconnected_initDisconnectOperation_called_expectSuccess() = runTest {
+    fun `waitForDisconnected initDisconnectOperation called expect success`() = runTest {
         bleManagerGattCallBacks.initDeferredDisconnectOperation()
 
         thread {
@@ -196,7 +241,7 @@ internal class BleManagerGattCallBacksTest {
     }
 
     @Test
-    fun waitForServicesDiscovered_initDiscoverServicesOperation_called_expectSuccess() = runTest {
+    fun `waitForServicesDiscovered initDiscoverServicesOperation called expect success`() = runTest {
         bleManagerGattCallBacks.initDeferredDiscoverServicesOperation()
 
         thread {
@@ -208,7 +253,7 @@ internal class BleManagerGattCallBacksTest {
     }
 
     @Test
-    fun waitForConnectionEstablished_errorOnConnectOperation_expectException() = runTest {
+    fun `waitForConnectionEstablished errorOnConnectOperation expect exception`() = runTest {
         bleManagerGattCallBacks.initDeferredConnectOperation()
 
         thread {
@@ -228,7 +273,7 @@ internal class BleManagerGattCallBacksTest {
     }
 
     @Test
-    fun waitForDataRead_errorOnReadOperation_expectException() = runTest {
+    fun `waitForDataRead errorOnReadOperation expect exception`() = runTest {
         coEvery { bleNetworkMessageProcessor.clearData() } just runs
 
         bleManagerGattCallBacks.initDeferredReadOperation()
@@ -252,7 +297,7 @@ internal class BleManagerGattCallBacksTest {
     }
 
     @Test
-    fun waitForWrittenDescriptor_errorOnWriteDescriptorOperation_expectException() = runTest {
+    fun `waitForWrittenDescriptor errorOnWriteDescriptorOperation expect exception`() = runTest {
         bleManagerGattCallBacks.initDeferredWriteDescriptorOperation()
 
         thread {
@@ -268,7 +313,7 @@ internal class BleManagerGattCallBacksTest {
     }
 
     @Test
-    fun waitForDisconnected_errorOnDisconnectOperation_expectException() = runTest {
+    fun `waitForDisconnected errorOnDisconnectOperation expect exception`() = runTest {
         bleManagerGattCallBacks.initDeferredDisconnectOperation()
 
         thread {
@@ -288,7 +333,7 @@ internal class BleManagerGattCallBacksTest {
     }
 
     @Test
-    fun waitForServicesDiscovered_errorOnDiscoverServicesOperation_expectException() = runTest {
+    fun `waitForServicesDiscovered errorOnDiscoverServicesOperation expect exception`() = runTest {
         bleManagerGattCallBacks.initDeferredDiscoverServicesOperation()
 
         thread {
@@ -304,13 +349,14 @@ internal class BleManagerGattCallBacksTest {
     }
 
     @Test
-    fun testResetFunction_expectCancelAllDeferredActions() = runTest {
+    fun `testResetFunction expectCancelAllDeferredActions`() = runTest {
         // Initialize operations
         bleManagerGattCallBacks.initDeferredConnectOperation()
         bleManagerGattCallBacks.initDeferredReadOperation()
         bleManagerGattCallBacks.initDeferredWriteDescriptorOperation()
         bleManagerGattCallBacks.initDeferredDisconnectOperation()
         bleManagerGattCallBacks.initDeferredDiscoverServicesOperation()
+        bleManagerGattCallBacks.initDeferredWriteOperation()
 
         // Perform reset
         bleManagerGattCallBacks.reset()
@@ -345,15 +391,21 @@ internal class BleManagerGattCallBacksTest {
                 bleManagerGattCallBacks.waitForServicesDiscovered()
             }
         }
+
+        assertThrows(UninitializedPropertyAccessException::class.java) {
+            runBlocking {
+                bleManagerGattCallBacks.waitForDataWrite()
+            }
+        }
     }
 
     @Test
-    fun reset_whenNonInitialized_expectJustRuns() = runTest {
+    fun `reset whenNonInitialized expectJustRuns`() = runTest {
         bleManagerGattCallBacks.reset()
     }
 
     @Test
-    fun subscribeToIncomeMessages_onCharacteristicReads_is_updated_with_income_messages() = runTest {
+    fun `subscribeToIncomeMessages onCharacteristicReads is updated with income messages`() = runTest {
         launch {
             val uuid = UUID.randomUUID()
             coEvery { bluetoothGattCharacteristicMock.uuid } returns uuid
@@ -367,7 +419,7 @@ internal class BleManagerGattCallBacksTest {
     }
 
     @Test
-    fun subscribeToIncomeMessages_onCharacteristicChanged_is_updated_with_income_messages() = runTest {
+    fun `subscribeToIncomeMessages onCharacteristicChanged is updated with income messages`() = runTest {
         launch {
             val uuid = UUID.randomUUID()
             coEvery { bluetoothGattCharacteristicMock.uuid } returns uuid
@@ -381,7 +433,7 @@ internal class BleManagerGattCallBacksTest {
     }
 
     @Test
-    fun subscribeToIncomeMessages_onCharacteristicChanged_bufferOverflow_messages_old_messages_dropped() = runTest {
+    fun `subscribeToIncomeMessages onCharacteristicChanged bufferOverflow messages old messages dropped`() = runTest {
         launch {
             val uuid = UUID.randomUUID()
             val uuid2 = UUID.randomUUID()

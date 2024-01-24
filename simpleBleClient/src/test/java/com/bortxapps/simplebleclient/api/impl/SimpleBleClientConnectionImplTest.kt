@@ -1,4 +1,4 @@
-package com.bortxapps.simplebleclient.manager
+package com.bortxapps.simplebleclient.api.impl
 
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
@@ -8,6 +8,10 @@ import android.content.Context
 import com.bortxapps.simplebleclient.api.contracts.BleNetworkMessageProcessor
 import com.bortxapps.simplebleclient.api.data.BleNetworkMessage
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
+import com.bortxapps.simplebleclient.manager.BleConfiguration
+import com.bortxapps.simplebleclient.manager.BleManagerGattCallBacks
+import com.bortxapps.simplebleclient.manager.BleManagerGattConnectionOperations
+import com.bortxapps.simplebleclient.manager.BleManagerGattSubscriptions
 import com.bortxapps.simplebleclient.manager.utils.checkBleHardwareAvailable
 import com.bortxapps.simplebleclient.manager.utils.checkBluetoothEnabled
 import com.bortxapps.simplebleclient.manager.utils.checkPermissions
@@ -23,39 +27,34 @@ import io.mockk.mockkStatic
 import io.mockk.runs
 import io.mockk.spyk
 import io.mockk.verify
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.util.UUID
 
-internal class BleManagerTest {
+internal class SimpleBleClientConnectionImplTest {
 
     private val bluetoothDeviceMock = mockk<BluetoothDevice>(relaxed = true)
     private val bluetoothDeviceMock2 = mockk<BluetoothDevice>(relaxed = true)
 
     private val contextMock = mockk<Context>(relaxed = true)
+
     private val bluetoothGattMock: BluetoothGatt by lazy { mockk<BluetoothGatt>(relaxed = true) }
     private val bluetoothCharacteristicMock = mockk<BluetoothGattCharacteristic>(relaxed = true)
 
-    private val bleManagerDeviceConnectionMock = mockk<BleManagerDeviceSearchOperations>(relaxed = true)
     private val bleManagerGattConnectionOperationsMock = mockk<BleManagerGattConnectionOperations>(relaxed = true)
     private val bleManagerGattSubscriptionsMock = mockk<BleManagerGattSubscriptions>(relaxed = true)
-    private val bleManagerGattReadOperationsMock = mockk<BleManagerGattReadOperations>(relaxed = true)
-    private val bleManagerGattWriteOperationsMock = mockk<BleManagerGattWriteOperations>(relaxed = true)
     private val bleManagerGattCallBacksMock = mockk<BleManagerGattCallBacks>(relaxed = true)
     private val bleNetworkMessageProcessorMock = mockk<BleNetworkMessageProcessor>(relaxed = true)
     private lateinit var bleConfiguration: BleConfiguration
+    private lateinit var gatHolder: GattHolder
 
-    private lateinit var bleManager: BleManager
+    private lateinit var simpleBleClientConnectionImpl: SimpleBleClientConnectionImpl
     private lateinit var mutex: Mutex
     private val serviceUUID = UUID.randomUUID()
     private val characteristicUUID = UUID.randomUUID()
@@ -67,8 +66,6 @@ internal class BleManagerTest {
 
     private val bleNetworkMessage = BleNetworkMessage(characteristicUUID, value)
 
-    private val characteristicMessageFlow = MutableSharedFlow<BleNetworkMessage>()
-
     @Before
     fun setUp() {
         mockkStatic(::checkBluetoothEnabled)
@@ -76,6 +73,8 @@ internal class BleManagerTest {
         mockkStatic(::checkPermissionsNotGrantedOldApi)
         mockkStatic(::checkPermissions)
         mockkStatic(::checkBleHardwareAvailable)
+
+        gatHolder = GattHolder()
 
         MockKAnnotations.init(this)
         mutex = Mutex()
@@ -95,15 +94,13 @@ internal class BleManagerTest {
         every { bleNetworkMessageProcessorMock.getPacket() } returns bleNetworkMessage
         every { bleManagerGattCallBacksMock.subscribeToConnectionStatusChanges() } returns MutableStateFlow(BluetoothProfile.STATE_CONNECTED)
 
-        bleManager = spyk(
-            BleManager(
-                bleManagerDeviceConnectionMock,
-                bleManagerGattConnectionOperationsMock,
-                bleManagerGattSubscriptionsMock,
-                bleManagerGattReadOperationsMock,
-                bleManagerGattWriteOperationsMock,
+        simpleBleClientConnectionImpl = spyk(
+            SimpleBleClientConnectionImpl(
+                contextMock,
+                gatHolder,
                 bleManagerGattCallBacksMock,
-                contextMock
+                bleManagerGattConnectionOperationsMock
+
             )
         )
     }
@@ -114,35 +111,6 @@ internal class BleManagerTest {
             mutex.unlock()
         }
     }
-
-    //region getDevicesByService
-    @Test
-    fun `getDevicesByServiceShould call BleManagerDeviceSearchOperations getDevicesByService`() = runTest {
-        coEvery { bleManagerDeviceConnectionMock.getDevicesNearBy(serviceUUID, null) } returns flow { emit(bluetoothDeviceMock) }
-
-        bleManager.getDevicesNearby(serviceUUID)
-
-        verify { bleManagerDeviceConnectionMock.getDevicesNearBy(serviceUUID, null) }
-    }
-
-    @Test
-    fun `getPairedDevices should call BleManagerDeviceSearchOperations getPairedDevicesByPrefix`() = runTest {
-        coEvery { bleManagerDeviceConnectionMock.getPairedDevices(contextMock) } returns listOf(bluetoothDeviceMock)
-
-        bleManager.getPairedDevices(contextMock)
-
-        verify { bleManagerDeviceConnectionMock.getPairedDevices(contextMock) }
-    }
-    //endregion
-
-    //region stopSearchDevices
-    @Test
-    fun `stopSearchDevices should call BleManagerDeviceSearchOperations stopSearchDevices`() = runTest {
-        bleManager.stopSearchDevices()
-
-        verify { bleManagerDeviceConnectionMock.stopSearchDevices() }
-    }
-    //endregion
 
     //region connectToDevice
     @Test
@@ -158,7 +126,7 @@ internal class BleManagerTest {
         coEvery { bleManagerGattSubscriptionsMock.subscribeToNotifications(bluetoothGattMock, characteristics) } returns true
 
         runBlocking {
-            assertTrue(bleManager.connectToDevice(contextMock, goProAddress))
+            Assert.assertTrue(simpleBleClientConnectionImpl.connectToDevice(contextMock, goProAddress))
             coVerify { bleManagerGattConnectionOperationsMock.connectToDevice(contextMock, goProAddress, bleManagerGattCallBacksMock) }
         }
     }
@@ -171,7 +139,7 @@ internal class BleManagerTest {
 
         Assert.assertThrows(SimpleBleClientException::class.java) {
             runBlocking {
-                bleManager.connectToDevice(contextMock, goProAddress)
+                simpleBleClientConnectionImpl.connectToDevice(contextMock, goProAddress)
             }
         }
 
@@ -184,7 +152,7 @@ internal class BleManagerTest {
     fun `disconnect gatt not initialized expect exception`() {
         Assert.assertThrows(SimpleBleClientException::class.java) {
             runBlocking {
-                bleManager.disconnect()
+                simpleBleClientConnectionImpl.disconnect()
             }
         }
     }
@@ -203,9 +171,9 @@ internal class BleManagerTest {
         coEvery { bleManagerGattConnectionOperationsMock.disconnect(bluetoothGattMock) } returns false
 
         runBlocking {
-            bleManager.connectToDevice(contextMock, goProAddress)
-            bleManager.disconnect()
-            verify(exactly = 0) { bleManager["freeResources"]() }
+            simpleBleClientConnectionImpl.connectToDevice(contextMock, goProAddress)
+            simpleBleClientConnectionImpl.disconnect()
+            verify(exactly = 0) { simpleBleClientConnectionImpl["freeResources"]() }
         }
     }
 
@@ -225,8 +193,8 @@ internal class BleManagerTest {
         coEvery { bleManagerGattCallBacksMock.reset() } just runs
 
         runBlocking {
-            bleManager.connectToDevice(contextMock, goProAddress)
-            bleManager.disconnect()
+            simpleBleClientConnectionImpl.connectToDevice(contextMock, goProAddress)
+            simpleBleClientConnectionImpl.disconnect()
             coVerify { bleManagerGattConnectionOperationsMock.freeConnection(bluetoothGattMock) }
             coVerify { bleManagerGattCallBacksMock.reset() }
         }
@@ -236,141 +204,11 @@ internal class BleManagerTest {
     //region subscribeToConnectionStatusChanges
     @Test
     fun `subscribeToConnectionStatusChanges just calls helper class`() = runTest {
-        bleManager.subscribeToConnectionStatusChanges()
+        simpleBleClientConnectionImpl.subscribeToConnectionStatusChanges()
 
-        coVerify { bleManager.subscribeToConnectionStatusChanges() }
+        coVerify { simpleBleClientConnectionImpl.subscribeToConnectionStatusChanges() }
     }
     //endregion
-
-    //region sendData
-    @Test
-    fun `sendData gatt not initialized expect exception`() = runTest {
-        Assert.assertThrows(SimpleBleClientException::class.java) {
-            runBlocking {
-                bleManager.sendData(serviceUUID, characteristicUUID, value)
-            }
-        }
-    }
-
-    @OptIn(ExperimentalUnsignedTypes::class)
-    @Test
-    fun `sendData gatt initialized expect read data invoked`() = runTest {
-        coEvery {
-            bleManagerGattConnectionOperationsMock.connectToDevice(
-                contextMock,
-                goProAddress,
-                bleManagerGattCallBacksMock
-            )
-        } returns bluetoothGattMock
-        coEvery { bleManagerGattConnectionOperationsMock.discoverServices(bluetoothGattMock) } returns false
-        coEvery { bleManagerGattSubscriptionsMock.subscribeToNotifications(bluetoothGattMock, characteristics) } returns true
-        coEvery { bleManagerGattConnectionOperationsMock.disconnect(bluetoothGattMock) } returns false
-        coEvery {
-            bleManagerGattWriteOperationsMock.sendData(
-                serviceUUID,
-                characteristicUUID,
-                value,
-                bluetoothGattMock
-            )
-        } returns bleNetworkMessage
-
-        runBlocking {
-            bleManager.connectToDevice(contextMock, goProAddress)
-            bleManager.sendData(serviceUUID, characteristicUUID, value)
-        }
-    }
-    //endregion
-
-    //region readData
-    @Test
-    fun `readData gatt not initialized expect exception`() = runTest {
-        Assert.assertThrows(SimpleBleClientException::class.java) {
-            runBlocking {
-                bleManager.readData(serviceUUID, characteristicUUID)
-            }
-        }
-    }
-
-    @Test
-    fun `readData gatt initialized expect read data invoked`() = runTest {
-        coEvery {
-            bleManagerGattConnectionOperationsMock.connectToDevice(
-                contextMock,
-                goProAddress,
-                bleManagerGattCallBacksMock
-            )
-        } returns bluetoothGattMock
-        coEvery { bleManagerGattConnectionOperationsMock.discoverServices(bluetoothGattMock) } returns false
-        coEvery { bleManagerGattSubscriptionsMock.subscribeToNotifications(bluetoothGattMock, characteristics) } returns true
-        coEvery { bleManagerGattConnectionOperationsMock.disconnect(bluetoothGattMock) } returns false
-        coEvery {
-            bleManagerGattReadOperationsMock.readData(
-                serviceUUID,
-                characteristicUUID,
-                bluetoothGattMock
-            )
-        } returns bleNetworkMessage
-
-        runBlocking {
-            bleManager.connectToDevice(contextMock, goProAddress)
-            bleManager.readData(serviceUUID, characteristicUUID)
-        }
-    }
-    //endregion
-
-    //region subscribeToCharacteristicChanges
-    @Test
-    fun `subscribeToCharacteristicChanges gatt not initialized expect exception`() = runTest {
-        Assert.assertThrows(SimpleBleClientException::class.java) {
-            runBlocking {
-                bleManager.subscribeToCharacteristicChanges(characteristics)
-            }
-        }
-    }
-
-    @Test
-    fun `subscribeToCharacteristicChanges gatt initialized expect subscribeToNotifications invoked`() = runTest {
-        coEvery {
-            bleManagerGattConnectionOperationsMock.connectToDevice(
-                contextMock,
-                goProAddress,
-                bleManagerGattCallBacksMock
-            )
-        } returns bluetoothGattMock
-        coEvery { bleManagerGattConnectionOperationsMock.discoverServices(bluetoothGattMock) } returns true
-        coEvery { bleManagerGattSubscriptionsMock.subscribeToNotifications(bluetoothGattMock, characteristics) } returns true
-
-        bleManager.connectToDevice(contextMock, goProAddress)
-        assertEquals(true, bleManager.subscribeToCharacteristicChanges(characteristics))
-    }
-
-    @Test
-    fun `subscribeToCharacteristicChanges gatt initialized discoverServices fails should throw exception`() = runTest {
-        coEvery {
-            bleManagerGattConnectionOperationsMock.connectToDevice(
-                contextMock,
-                goProAddress,
-                bleManagerGattCallBacksMock
-            )
-        } returns bluetoothGattMock
-        coEvery { bleManagerGattConnectionOperationsMock.discoverServices(bluetoothGattMock) } returns false
-
-        Assert.assertThrows(SimpleBleClientException::class.java) {
-            runBlocking {
-                bleManager.connectToDevice(contextMock, goProAddress)
-                bleManager.subscribeToCharacteristicChanges(characteristics)
-            }
-        }
-    }
-    //endregion
-
-    //region subscribeToIncomeMessages
-    @Test
-    fun `subscribeToIncomeMessages just calls helper class`() {
-        every { bleManagerGattSubscriptionsMock.subscribeToIncomeMessages() } returns characteristicMessageFlow
-
-        assertEquals(characteristicMessageFlow, bleManager.subscribeToIncomeMessages())
-    }
 
     private fun mockValidationsAllOk() {
         coEvery { checkBluetoothEnabled(any()) } returns Unit

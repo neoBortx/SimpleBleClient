@@ -61,7 +61,6 @@ android {
             withJavadocJar()
         }
     }
-
 }
 
 detekt {

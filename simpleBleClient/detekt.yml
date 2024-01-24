@@ -492,7 +492,7 @@ potential-bugs:
     active: true
   UnsafeCallOnNullableType:
     active: true
-    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/BleManager.kt']
+    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/SimpleBleClientWriterImpl.kt', '**/SimpleBleClientConnectionImpl.kt', '**/SimpleBleClientSubscriptionImpl.kt', '**/SimpleBleClientSubscriptionImpl.kt', '**/SimpleBleClientReaderImpl.kt']
   UnsafeCast:
     active: true
   UnusedUnaryOperator:
