@@ -1,11 +1,9 @@
 package com.bortxapps.simplebleclient.api.contracts
 
-import androidx.annotation.Keep
 import com.bortxapps.simplebleclient.api.data.BleNetworkMessage
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
 import java.util.UUID
 
-@Keep
 public interface SimpleBleClientWriter {
     /**
      * Sends data to a specified BLE service / characteristic and waits for a response from the device.

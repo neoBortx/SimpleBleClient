@@ -42,11 +42,8 @@ jobs:
       - name: Decode Keystore
         run: pwd; echo ${{ secrets.ENCODED_KEYSTORE }} | base64 -d > ${{ secrets.KEYSTORE_NAME }}
 
-      - name: Build and Sign release AAR
-        run: ./gradlew assembleRelease
-
-      - name: Build debug AAR
-        run: ./gradlew assembleDebug
+      - name: Build debug / release AAR, Generate API documentation
+        run: ./gradlew assemble
 
       - name: Create Github Release
         uses: softprops/action-gh-release@v1
@@ -55,6 +52,6 @@ jobs:
           prerelease: true
           draft: false
           files: |
-            simpleBleClient/build/outputs/aar/${{ env.RELEASE_ARTIFACT }}
-            simpleBleClient/build/outputs/aar/${{ env.DEBUG_ARTIFACT }}
+            simpleBleClient/build/outputs/aar/*
+            simpleBleClient/build/libs/*
             LICENSE

@@ -1,9 +1,13 @@
+import org.jetbrains.dokka.DokkaConfiguration.Visibility
+import org.jetbrains.dokka.gradle.DokkaTask
+
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.klint)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.dokka)
     `maven-publish`
 }
 
@@ -28,6 +32,7 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
         release {
+            version = "$versionLib"
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
@@ -106,4 +111,37 @@ tasks.register("printDebugArtifactName") {
     doLast {
         println("simpleBleClient_debug_$versionLib.aar")
     }
+}
+
+// Configure all single-project Dokka tasks at the same time,
+// such as dokkaHtml, dokkaJavadoc and dokkaGfm.
+tasks.withType<DokkaTask>().configureEach {
+    dokkaSourceSets.configureEach {
+        documentedVisibilities.set(
+            setOf(
+                Visibility.PUBLIC
+            )
+        )
+
+        perPackageOption {
+            matchingRegex.set(".*internal.*")
+            suppress.set(true)
+        }
+    }
+}
+
+tasks.register<Jar>("dokkaHtmlJar") {
+    dependsOn(tasks.dokkaHtml)
+    from(tasks.dokkaHtml.flatMap { it.outputDirectory })
+    archiveClassifier.set("html-docs")
+}
+
+tasks.named("assemble") {
+    finalizedBy(tasks.named("dokkaHtmlJar"))
+}
+
+tasks.register<Jar>("dokkaJavadocJar") {
+    dependsOn(tasks.dokkaJavadoc)
+    from(tasks.dokkaJavadoc.flatMap { it.outputDirectory })
+    archiveClassifier.set("javadoc")
 }

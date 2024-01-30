@@ -1,8 +1,5 @@
 package com.bortxapps.simplebleclient.exceptions
 
-import androidx.annotation.Keep
-
-@Keep
 public enum class BleError {
     BLE_DEVICE_NOT_FOUND,
     CAMERA_NOT_CONNECTED,

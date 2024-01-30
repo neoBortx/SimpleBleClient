@@ -1,6 +1,5 @@
 package com.bortxapps.simplebleclient.api.data
 
-import androidx.annotation.Keep
 import java.util.UUID
 
 /**
@@ -17,7 +16,6 @@ import java.util.UUID
  *                       and not all the data has been received.
  */
 
-@Keep
 public data class BleNetworkMessage(val characteristicsId: UUID?, val data: ByteArray, val missingData: Boolean = false) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

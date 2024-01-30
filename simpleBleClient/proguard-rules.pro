@@ -23,3 +23,10 @@
 # Please add these rules to your existing keep rules in order to suppress warnings.
 # This is generated automatically by the Android Gradle plugin.
 -dontwarn java.lang.invoke.StringConcatFactory
+
+-keep public interface com.bortxapps.simplebleclient.api.contracts.* { *; }
+-keep public class com.bortxapps.simplebleclient.api.data.* { *; }
+-keep public class com.bortxapps.simplebleclient.api.SimpleBleClientBuilder
+-keepclassmembers class com.bortxapps.simplebleclient.api.SimpleBleClientBuilder {
+    public *;
+}

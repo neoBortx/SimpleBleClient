@@ -1,6 +1,5 @@
 package com.bortxapps.simplebleclient.api.contracts
 
-import androidx.annotation.Keep
 import com.bortxapps.simplebleclient.api.data.BleNetworkMessage
 import java.util.UUID
 
@@ -13,7 +12,7 @@ import java.util.UUID
  *
  * If this Interface doesn't match with your needs, you can implement your own and pass it to the SimpleBleClientBuilder.
  */
-@Keep
+
 public interface BleNetworkMessageProcessor {
 
     /**

@@ -1,11 +1,9 @@
 package com.bortxapps.simplebleclient.api.contracts
 
-import androidx.annotation.Keep
 import com.bortxapps.simplebleclient.api.data.BleNetworkMessage
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
 import java.util.UUID
 
-@Keep
 public interface SimpleBleClientReader {
 
     /**

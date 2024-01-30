@@ -2,7 +2,6 @@
 
 package com.bortxapps.simplebleclient.manager.utils
 
-import androidx.annotation.Keep
 import com.bortxapps.simplebleclient.api.contracts.BleNetworkMessageProcessor
 import com.bortxapps.simplebleclient.api.data.BleNetworkMessage
 import java.util.UUID
@@ -14,7 +13,7 @@ import java.util.UUID
  *
  * It goings to return the message as is.
  */
-@Keep
+
 public class BleNetworkMessageProcessorDefaultImpl : BleNetworkMessageProcessor {
 
     private var packet = byteArrayOf()
