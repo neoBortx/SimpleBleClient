@@ -98,7 +98,7 @@ publishing {
             artifactId = "simplebleclient"
             version = "$versionLib"
             description = "A simple BLE client library for Android that works with coroutines"
-            artifact("$buildDir/outputs/aar/simpleBleClient_$versionLib.aar")
+            artifact("$buildDir/outputs/aar/simplebleclient_$versionLib.aar")
             artifact(sourcesJar.get())
         }
     }
