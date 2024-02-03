@@ -148,3 +148,7 @@ tasks.register<Jar>("dokkaJavadocJar") {
     from(tasks.dokkaJavadoc.flatMap { it.outputDirectory })
     archiveClassifier.set("javadoc")
 }
+
+tasks.named("publishReleasePublicationToMavenLocal").configure {
+    dependsOn("assembleRelease")
+}
