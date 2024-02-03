@@ -106,7 +106,6 @@ public class SimpleBleClientBuilder {
     }
 
     private fun buildInstance(context: Context): SimpleBleClient {
-
         with(bleLibraryContainer.getBleConfiguration()) {
             operationTimeOutMillisConf?.let { operationTimeoutMillis = it }
             scanPeriodMillisConf?.let { scanPeriodMillis = it }
