@@ -24,7 +24,21 @@
 # This is generated automatically by the Android Gradle plugin.
 -dontwarn java.lang.invoke.StringConcatFactory
 
--keep public interface com.bortxapps.simplebleclient.api.contracts.* { public *; }
--keep public class com.bortxapps.simplebleclient.api.data.* { public *; }
+-keep public interface com.bortxapps.simplebleclient.api.contracts.BleNetworkMessageProcessor { public *; }
+-keep public interface com.bortxapps.simplebleclient.api.contracts.SimpleBleClient { public *; }
+-keep class com.bortxapps.simplebleclient.api.contracts.SimpleBleClient$DefaultImpls { *; }
+-keep public interface com.bortxapps.simplebleclient.api.contracts.SimpleBleClientConnection { public *; }
+-keep class com.bortxapps.simplebleclient.api.contracts.SimpleBleClientConnection$DefaultImpls { *; }
+-keep public interface com.bortxapps.simplebleclient.api.contracts.SimpleBleClientDeviceSeeker { public *; }
+-keep class com.bortxapps.simplebleclient.api.contracts.SimpleBleClientDeviceSeeker$DefaultImpls { *; }
+-keep public interface com.bortxapps.simplebleclient.api.contracts.SimpleBleClientReader { public *; }
+-keep class com.bortxapps.simplebleclient.api.contracts.SimpleBleClientReader$DefaultImpls { *; }
+-keep public interface com.bortxapps.simplebleclient.api.contracts.SimpleBleClientWriter { public *; }
+-keep class com.bortxapps.simplebleclient.api.contracts.SimpleBleClientWriter$DefaultImpls { *; }
+-keep public interface com.bortxapps.simplebleclient.api.contracts.SimpleBleClientSubscription { public *; }
+-keep class com.bortxapps.simplebleclient.api.contracts.SimpleBleClientSubscription$DefaultImpls { *; }
+-keep public class com.bortxapps.simplebleclient.api.data.BleConnectionStatus { public *; }
+-keep public class com.bortxapps.simplebleclient.api.data.BleNetworkMessage { public *; }
 -keep public class com.bortxapps.simplebleclient.api.SimpleBleClientBuilder { public *; }
--keep public class com.bortxapps.simplebleclient.exceptions.* { public *; }
+-keep public class com.bortxapps.simplebleclient.exceptions.BleError { public *; }
+-keep public class com.bortxapps.simplebleclient.exceptions.SimpleBleClientException { public *; }
