@@ -27,6 +27,4 @@
 -keep public interface com.bortxapps.simplebleclient.api.contracts.* { *; }
 -keep public class com.bortxapps.simplebleclient.api.data.* { *; }
 -keep public class com.bortxapps.simplebleclient.api.SimpleBleClientBuilder
--keepclassmembers class com.bortxapps.simplebleclient.api.SimpleBleClientBuilder {
-    public *;
-}
+-keep public class com.bortxapps.simplebleclient.exceptions.* { *; }
