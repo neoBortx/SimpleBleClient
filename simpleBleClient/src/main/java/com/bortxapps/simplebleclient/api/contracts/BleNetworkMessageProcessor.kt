@@ -8,9 +8,9 @@ import java.util.UUID
  *
  * BLE operations are asynchronous but you only can perform one in a time. When you're expecting a fragmented messages, you need to wait
  * for the last message to be received before sending the next operation. Because this is not straightforward, this interface is used to
- * encapsulate the logic to handle this kind of messages in lower layers.
+ * encapsulate the logic to handle this kind of messages in lower layers for you.
  *
- * If this Interface doesn't match with your needs, you can implement your own and pass it to the SimpleBleClientBuilder.
+ * You should implement your own and pass it to the SimpleBleClientBuilder.
  */
 
 public interface BleNetworkMessageProcessor {

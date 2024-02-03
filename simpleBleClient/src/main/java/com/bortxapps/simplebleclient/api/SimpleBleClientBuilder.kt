@@ -50,18 +50,54 @@ public class SimpleBleClientBuilder {
     @VisibleForTesting
     internal var bleLibraryContainer: BleLibraryContainer = BleLibraryContainer()
 
+    /**
+     * Set the operation timeout (in milliseconds) for BLE operations.
+     * Default is 7000 milliseconds
+     * @param timeout The maximum amount of time to wait for a BLE operation to complete.
+     * If the operation does not complete within this time, an exception will be thrown.
+     * @return This [SimpleBleClientBuilder] instance
+     */
     public fun setOperationTimeOutMillis(timeout: Long): SimpleBleClientBuilder =
         apply { operationTimeOutMillisConf = timeout }
 
+    /**
+     * Set the scan period (in milliseconds) for scanning for BLE devices.
+     * Default is 10000 milliseconds
+     * @param timeout The maximum amount of time to scan for BLE devices.
+     * If no devices are found within this time, the library will return an empty list
+     * @return This [SimpleBleClientBuilder] instance
+     */
     public fun setScanPeriodMillis(timeout: Long): SimpleBleClientBuilder =
         apply { scanPeriodMillisConf = timeout }
 
+    /**
+     * Set the message processor to use for processing messages received from BLE devices.
+     * If not set, a default message processor will be used witch will returns messages as they are received, so for complex messages you
+     * will have to subscribe to SimpleBleClientSubscription.subscribeToIncomeMessages and develop your own message processor and operation
+     * scheduler because ble operations are not thread safe and can't be concurrent.
+     *
+     * @param messageProcessor The message processor to use for processing messages received from BLE devices.
+     * @return This [SimpleBleClientBuilder] instance
+     */
     public fun setMessageProcessor(messageProcessor: BleNetworkMessageProcessor): SimpleBleClientBuilder =
         apply { this.messageProcessorConf = messageProcessor }
 
+    /**
+     * Set the message buffer size to use for buffering messages received from BLE devices.
+     * If the buffer is full, the oldest message will be removed
+     * Default is 1
+     * @param messageBufferSize The number of messages to store in the incoming message buffer.
+     * @return This [SimpleBleClientBuilder] instance
+     */
     public fun setMessageBufferSize(messageBufferSize: Int): SimpleBleClientBuilder =
         apply { this.messageBufferSizeConf = messageBufferSize }
 
+    /**
+     * Set the number of messages to store in the incoming message buffer to new consumer of the incoming message flow
+     * Default is 0
+     * @param messageBufferRetries The number of messages to store in the incoming message buffer to new consumer of the incoming message flow
+     * @return This [SimpleBleClientBuilder] instance
+     */
     public fun setMessageBufferRetries(messageBufferRetries: Int): SimpleBleClientBuilder =
         apply { this.messageBufferRetriesConf = messageBufferRetries }
 

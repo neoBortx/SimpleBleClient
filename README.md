@@ -10,8 +10,8 @@ SimpleBleClient is an Android library designed to simplify Bluetooth Low Energy 
 - Asynchronous operations using Kotlin coroutines.
 - Search and filter BLE devices based on services.
 - Read and write data from/to BLE devices.
-- Subcribe to connection status changes.
-- Subcribe to characteristics changes
+- Subscribe to connection status changes.
+- Subscribe to characteristics changes
 
 
 ## Gradle
@@ -64,7 +64,7 @@ First you need to build the client, some behaviors of the BLE client can be conf
 
         /**
          * The number of messages to store in the incoming message buffer to new consumer of the incoming message flow
-         * Default 0
+         * Default 1
         **/
         const val MESSAGE_BUFFER_RETRIES = 0
     }
@@ -165,7 +165,7 @@ Also, you can disconnect the BLE device anytime:
 
 ```kotlin
 CoroutineScope(Dispatchers.IO).launch {
-    bleClient.connection.disconnect()
+    simpleBleClient.connection.disconnect()
 }
 ```
 
@@ -252,7 +252,7 @@ CoroutineScope(Dispatchers.IO).launch {
     val characteristicUUID = UUID.fromString("your-characteristic-uuid")
     val dataToSend = "Hello BLE".toByteArray()
 
-    val result = simpleBleClient.sendData(serviceUUID, characteristicUUID, dataToSend)
+    val result = simpleBleClient.writer.sendData(serviceUUID, characteristicUUID, dataToSend)
     // Handle the result
 }
 ```
