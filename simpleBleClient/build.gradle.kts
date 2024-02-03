@@ -100,7 +100,6 @@ publishing {
             description = "A simple BLE client library for Android that works with coroutines"
             artifact("$buildDir/outputs/aar/simpleBleClient_$versionLib.aar")
             artifact(sourcesJar.get())
-            artifact(file("$buildDir/libs/simpleBleClient-$versionLib-javadoc.jar"))
         }
     }
 }
