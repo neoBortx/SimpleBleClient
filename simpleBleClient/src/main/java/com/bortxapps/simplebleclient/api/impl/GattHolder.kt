@@ -20,7 +20,7 @@ internal class GattHolder {
 
     fun checkGatt() {
         if (bluetoothGatt == null) {
-            throw SimpleBleClientException(BleError.CAMERA_NOT_CONNECTED)
+            throw SimpleBleClientException(BleError.BLE_DEVICE_NOT_CONNECTED)
         }
     }
 }

@@ -37,7 +37,7 @@ internal class SimpleBleClientConnectionImpl(
         launchBleOperationWithValidations(context) {
             bleManagerGattConnectionOperations.connectToDevice(context, address, bleManagerGattCallBacks)?.let {
                 gattHolder.setGatt(it)
-            } ?: throw SimpleBleClientException(BleError.CAMERA_NOT_CONNECTED)
+            } ?: throw SimpleBleClientException(BleError.BLE_DEVICE_NOT_CONNECTED)
             true
         }
 

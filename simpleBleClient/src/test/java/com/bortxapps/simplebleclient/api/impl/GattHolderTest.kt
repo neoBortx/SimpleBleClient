@@ -26,7 +26,7 @@ internal class GattHolderTest {
 
         // Then
         assert(exception is SimpleBleClientException)
-        assert((exception as SimpleBleClientException).bleError == BleError.CAMERA_NOT_CONNECTED)
+        assert((exception as SimpleBleClientException).bleError == BleError.BLE_DEVICE_NOT_CONNECTED)
     }
 
     @Test
