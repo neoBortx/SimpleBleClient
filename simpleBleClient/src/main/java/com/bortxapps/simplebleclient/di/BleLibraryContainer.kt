@@ -20,9 +20,9 @@ import com.bortxapps.simplebleclient.scanner.BleDeviceScannerSettingsBuilder
 import kotlinx.coroutines.sync.Mutex
 
 internal class BleLibraryContainer {
-    private lateinit var blueToothScanner: BluetoothLeScanner
-    private lateinit var bleConfiguration: BleConfiguration
+    private var bleConfiguration = BleConfiguration()
 
+    private lateinit var blueToothScanner: BluetoothLeScanner
     private lateinit var bleDeviceScannerManager: BleDeviceScannerManager
     private lateinit var bleManagerGattCallBacks: BleManagerGattCallBacks
     private lateinit var bleManagerDeviceSearchOperations: BleManagerDeviceSearchOperations
@@ -30,15 +30,12 @@ internal class BleLibraryContainer {
     private lateinit var bleManagerGattSubscriptions: BleManagerGattSubscriptions
     private lateinit var bleManagerGattWriteOperations: BleManagerGattWriteOperations
     private lateinit var bleManagerGattReadOperations: BleManagerGattReadOperations
-
     private lateinit var gattMutex: Mutex
     private lateinit var buildVersionProvider: BuildVersionProvider
     private lateinit var bleMessageProcessorProvider: BleMessageProcessorProvider
 
     fun init(context: Context) {
         gattMutex = Mutex()
-
-        bleConfiguration = BleConfiguration()
 
         bleMessageProcessorProvider = BleMessageProcessorProvider(bleConfiguration)
 
@@ -87,9 +84,6 @@ internal class BleLibraryContainer {
     }
 
     fun getBleConfiguration(): BleConfiguration {
-        if (::bleConfiguration.isInitialized.not()) {
-            throw SimpleBleClientException(BleError.LIBRARY_NOT_INITIALIZED)
-        }
         return bleConfiguration
     }
 

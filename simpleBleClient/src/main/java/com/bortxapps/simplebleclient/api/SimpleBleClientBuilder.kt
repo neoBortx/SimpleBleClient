@@ -106,7 +106,6 @@ public class SimpleBleClientBuilder {
     }
 
     private fun buildInstance(context: Context): SimpleBleClient {
-        bleLibraryContainer.init(context)
 
         with(bleLibraryContainer.getBleConfiguration()) {
             operationTimeOutMillisConf?.let { operationTimeoutMillis = it }
@@ -115,6 +114,8 @@ public class SimpleBleClientBuilder {
             messageBufferSizeConf?.let { messageBufferSize = it }
             messageBufferRetriesConf?.let { messageBufferRetries = it }
         }
+
+        bleLibraryContainer.init(context)
 
         with(bleLibraryContainer) {
             return SimpleBleClientFactory(
