@@ -86,17 +86,21 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
 }
 
+val sourcesJar by tasks.registering(Jar::class) {
+    from(android.sourceSets.getByName("main").java.srcDirs)
+    archiveClassifier.set("sources")
+}
+
 publishing {
     publications {
-        register<MavenPublication>("release") {
+        create<MavenPublication>("release") {
             groupId = "com.neobortx"
             artifactId = "simplebleclient"
             version = "$versionLib"
             description = "A simple BLE client library for Android that works with coroutines"
-
-            afterEvaluate {
-                from(components["release"])
-            }
+            artifact("$buildDir/outputs/aar/simpleBleClient_$versionLib.aar")
+            artifact(sourcesJar.get())
+            artifact(file("$buildDir/libs/simpleBleClient-$versionLib-javadoc.jar"))
         }
     }
 }
@@ -137,7 +141,7 @@ tasks.register<Jar>("dokkaHtmlJar") {
 }
 
 tasks.named("assemble") {
-    finalizedBy(tasks.named("dokkaHtmlJar"))
+    finalizedBy(tasks.named("dokkaJavadocJar"))
 }
 
 tasks.register<Jar>("dokkaJavadocJar") {
