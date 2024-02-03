@@ -24,7 +24,7 @@
 # This is generated automatically by the Android Gradle plugin.
 -dontwarn java.lang.invoke.StringConcatFactory
 
--keep public interface com.bortxapps.simplebleclient.api.contracts.* { *; }
--keep public class com.bortxapps.simplebleclient.api.data.* { *; }
--keep public class com.bortxapps.simplebleclient.api.SimpleBleClientBuilder
--keep public class com.bortxapps.simplebleclient.exceptions.* { *; }
+-keep public interface com.bortxapps.simplebleclient.api.contracts.* { public *; }
+-keep public class com.bortxapps.simplebleclient.api.data.* { public *; }
+-keep public class com.bortxapps.simplebleclient.api.SimpleBleClientBuilder { public *; }
+-keep public class com.bortxapps.simplebleclient.exceptions.* { public *; }
