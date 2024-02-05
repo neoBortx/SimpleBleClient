@@ -136,8 +136,9 @@ internal class BleManagerGattCallBacks(bleConfiguration: BleConfiguration, bleMe
     private fun processCharacteristic(uuid: UUID, value: ByteArray) {
         bleMessageProcessor.processMessage(uuid, value)
         if (bleMessageProcessor.isFullyReceived()) {
-            incomeMessages.tryEmit(BleNetworkMessage(uuid, value))
-            onDataReadDeferred?.complete(bleMessageProcessor.getPacket())
+            val packet = bleMessageProcessor.getPacket()
+            incomeMessages.tryEmit(packet)
+            onDataReadDeferred?.complete(packet)
         }
     }
 
