@@ -57,7 +57,6 @@ internal class BleDeviceScannerTest {
         }
         every { Looper.getMainLooper() } returns looper
 
-
         coEvery { bleDeviceScannerFilterBuilderMock.buildFilterByService(serviceUuid) } returns mockk(relaxed = true)
         coEvery { bleDeviceScannerFilterBuilderMock.buildFilterByDeviceName(deviceName) } returns mockk(relaxed = true)
     }
