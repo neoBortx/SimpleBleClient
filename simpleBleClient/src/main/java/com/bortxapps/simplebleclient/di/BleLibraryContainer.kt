@@ -20,7 +20,7 @@ import com.bortxapps.simplebleclient.scanner.BleDeviceScannerSettingsBuilder
 import kotlinx.coroutines.sync.Mutex
 
 internal class BleLibraryContainer {
-    private var bleConfiguration = BleConfiguration()
+    private val bleConfiguration = BleConfiguration()
 
     private lateinit var blueToothScanner: BluetoothLeScanner
     private lateinit var bleDeviceScannerManager: BleDeviceScannerManager
