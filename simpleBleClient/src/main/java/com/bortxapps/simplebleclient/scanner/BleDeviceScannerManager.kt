@@ -54,7 +54,7 @@ internal class BleDeviceScannerManager(
             )
         } catch (ex: Exception) {
             Log.e("BleManager", "Error starting scan ${ex.message} ${ex.stackTraceToString()}")
-            close(SimpleBleClientException(BleError.CANNOT_START_SEARCHING_DEVICES))
+            close(SimpleBleClientException(BleError.CANNOT_START_SEARCHING_DEVICES, "${ex.message} ${ex.stackTraceToString()}"))
         }
 
         bleScannerTimerHandler = Timer().also {

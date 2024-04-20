@@ -9,4 +9,4 @@ import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
 
 internal fun getBlueToothScannerFactory(context: Context): BluetoothLeScanner =
     ContextCompat.getSystemService(context.applicationContext, BluetoothManager::class.java)?.adapter?.bluetoothLeScanner
-        ?: throw SimpleBleClientException(BleError.UNABLE_INITIALIZE_CONTROLLER)
+        ?: throw SimpleBleClientException(BleError.UNABLE_INITIALIZE_CONTROLLER, "Bluetooth scanner not found in the system.")

@@ -73,7 +73,7 @@ internal class BleManagerGattSubscriptions(
             } ?: false
         } catch (ex: Exception) {
             Log.e("BleManager", "writeDescriptor ${ex.message} ${ex.stackTraceToString()}")
-            throw SimpleBleClientException(BleError.UNABLE_TO_SUBSCRIBE_TO_NOTIFICATIONS)
+            throw SimpleBleClientException(BleError.UNABLE_TO_SUBSCRIBE_TO_NOTIFICATIONS, "${ex.message} ${ex.stackTraceToString()}")
         }
 
     private fun filterCharacteristicForSubscriptions(properties: Int) =

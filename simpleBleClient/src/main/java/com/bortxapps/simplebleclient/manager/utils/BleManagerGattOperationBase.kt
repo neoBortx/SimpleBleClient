@@ -1,6 +1,5 @@
 package com.bortxapps.simplebleclient.manager.utils
 
-import android.util.Log
 import com.bortxapps.simplebleclient.exceptions.BleError
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
 import com.bortxapps.simplebleclient.manager.BleConfiguration
@@ -16,39 +15,36 @@ internal abstract class BleManagerGattOperationBase(
 ) {
 
     protected suspend fun <T> launchGattOperation(operation: suspend () -> T): T {
-        val error: BleError = try {
+        try {
             return withTimeout(bleConfiguration.operationTimeoutMillis) {
                 gattMutex.withLock {
                     operation()
                 }
             }
         } catch (e: TimeoutCancellationException) {
-            Log.e("BleManager", "launchGattOperation TIMEOUT ${e.message} ${e.stackTraceToString()}")
-            BleError.BLE_DEVICE_NOT_RESPONDING
+            handleException(e, BleError.BLE_DEVICE_NOT_RESPONDING)
         } catch (e: SimpleBleClientException) {
-            e.bleError
+            throw e
         } catch (e: Exception) {
-            Log.e("BleManager", "launchGattOperation ERROR ${e.message} ${e.stackTraceToString()}")
-            BleError.COMMUNICATION_FAILED
+            handleException(e, BleError.COMMUNICATION_FAILED)
         }
-
-        throw SimpleBleClientException(error)
     }
 
     protected suspend fun <T> launchDeferredOperation(operation: suspend () -> T): T {
-        val error: BleError = try {
+        try {
             return operation()
         } catch (e: CancellationException) {
-            Log.e("BleManager", "launchGattOperation Failed ${e.message} ${e.stackTraceToString()}")
-            BleError.COMMUNICATION_FAILED
+            handleException(e, BleError.COMMUNICATION_FAILED)
         } catch (e: UninitializedPropertyAccessException) {
-            Log.e("BleManager", "launchGattOperation Failed ${e.message} ${e.stackTraceToString()}")
-            BleError.INTERNAL_ERROR
+            handleException(e, BleError.INTERNAL_ERROR)
+        } catch (e: SimpleBleClientException) {
+            throw e
         } catch (e: Exception) {
-            Log.e("BleManager", "launchGattOperation Failed ${e.message} ${e.stackTraceToString()}")
-            BleError.OTHER
+            handleException(e, BleError.COMMUNICATION_FAILED)
         }
+    }
 
-        throw SimpleBleClientException(error)
+    private fun handleException(e: Exception, error: BleError): Nothing {
+        throw SimpleBleClientException(error, "${e.message} ${e.stackTraceToString()}")
     }
 }

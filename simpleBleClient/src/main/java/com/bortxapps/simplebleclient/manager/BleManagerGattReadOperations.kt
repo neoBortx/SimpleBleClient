@@ -39,7 +39,7 @@ internal class BleManagerGattReadOperations(
             }
         }
 
-        return resultRead ?: throw SimpleBleClientException(BleError.SEND_COMMAND_FAILED)
+        return resultRead ?: throw SimpleBleClientException(BleError.SEND_COMMAND_FAILED_NO_DATA_RECEIVED_IN_RESPONSE, "No data received from device")
     }
     //endregion
 }

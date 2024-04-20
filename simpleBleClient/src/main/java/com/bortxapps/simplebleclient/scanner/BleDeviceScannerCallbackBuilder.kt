@@ -11,14 +11,12 @@ internal class BleDeviceScannerCallbackBuilder {
     ): ScanCallback {
         return object : ScanCallback() {
             override fun onScanResult(callbackType: Int, result: ScanResult?) {
-                // super.onScanResult(callbackType, result)
                 result?.device?.let {
                     onResult(it)
                 } ?: onFailure()
             }
 
             override fun onBatchScanResults(results: MutableList<ScanResult>?) {
-                // super.onBatchScanResults(results)
                 results?.forEach { result ->
                     result.device?.let {
                         onResult(it)
@@ -27,7 +25,6 @@ internal class BleDeviceScannerCallbackBuilder {
             }
 
             override fun onScanFailed(errorCode: Int) {
-                // super.onScanFailed(errorCode)
                 onFailure()
             }
         }

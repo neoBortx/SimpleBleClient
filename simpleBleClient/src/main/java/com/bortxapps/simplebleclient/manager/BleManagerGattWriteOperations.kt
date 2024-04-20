@@ -36,7 +36,7 @@ internal class BleManagerGattWriteOperations(
             )
         } ?: run {
             Log.e("BleManager", "writeCharacteristic characteristic is null")
-            throw SimpleBleClientException(BleError.SEND_COMMAND_FAILED)
+            throw SimpleBleClientException(BleError.SEND_COMMAND_FAILED_NO_CHARACTERISTIC_FOUND_TO_SEND, "Characteristic is null")
         }
     }
 
@@ -54,7 +54,7 @@ internal class BleManagerGattWriteOperations(
             )
         } ?: run {
             Log.e("BleManager", "writeCharacteristic characteristic is null")
-            throw SimpleBleClientException(BleError.SEND_COMMAND_FAILED)
+            throw SimpleBleClientException(BleError.SEND_COMMAND_FAILED_NO_CHARACTERISTIC_FOUND_TO_SEND, "Characteristic is null")
         }
     }
 
@@ -85,7 +85,7 @@ internal class BleManagerGattWriteOperations(
                 null
             }
         } ?: run {
-            throw SimpleBleClientException(BleError.SEND_COMMAND_FAILED)
+            throw SimpleBleClientException(BleError.SEND_COMMAND_FAILED_NO_DATA_RECEIVED_IN_RESPONSE, "No data received from device")
         }
     }
 
@@ -116,7 +116,7 @@ internal class BleManagerGattWriteOperations(
                 null
             }
         } ?: run {
-            throw SimpleBleClientException(BleError.SEND_COMMAND_FAILED)
+            throw SimpleBleClientException(BleError.SEND_COMMAND_FAILED_NO_DATA_RECEIVED_IN_RESPONSE, "No data received from device")
         }
     }
     //endregion
