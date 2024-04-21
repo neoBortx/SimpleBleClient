@@ -43,20 +43,20 @@ internal class BleManagerGattCallBacks(bleConfiguration: BleConfiguration, bleMe
                 }
 
                 BluetoothProfile.STATE_DISCONNECTED -> {
-                    Log.e("BleManagerGattCallBacks", "onConnectionStateChange: STATE_DISCONNECTED")
+                    Log.d("BleManagerGattCallBacks", "onConnectionStateChange: STATE_DISCONNECTED")
                     onDisconnectedDeferred?.complete(true)
                 }
 
                 BluetoothProfile.STATE_CONNECTING -> {
-                    Log.e("BleManagerGattCallBacks", "onConnectionStateChange: STATE_CONNECTING")
+                    Log.d("BleManagerGattCallBacks", "onConnectionStateChange: STATE_CONNECTING")
                 }
 
                 BluetoothProfile.STATE_DISCONNECTING -> {
-                    Log.e("BleManagerGattCallBacks", "onConnectionStateChange: STATE_DISCONNECTING")
+                    Log.d("BleManagerGattCallBacks", "onConnectionStateChange: STATE_DISCONNECTING")
                 }
 
                 else -> {
-                    Log.e("BleManagerGattCallBacks", "onConnectionStateChange: UNKNOWN")
+                    Log.d("BleManagerGattCallBacks", "onConnectionStateChange: UNKNOWN")
                 }
             }
             connectionStatus.tryEmit(newState)

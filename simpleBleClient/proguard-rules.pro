@@ -24,6 +24,17 @@
 # This is generated automatically by the Android Gradle plugin.
 -dontwarn java.lang.invoke.StringConcatFactory
 
+-keepclassmembers class ** {
+    public void enableLogging();
+}
+-keep class android.util.Log {
+    public static *** e(...);
+    public static *** d(...);
+    public static *** v(...);
+    public static *** i(...);
+    public static *** w(...);
+}
+
 -keep public interface com.bortxapps.simplebleclient.api.contracts.BleNetworkMessageProcessor { public *; }
 -keep public interface com.bortxapps.simplebleclient.api.contracts.SimpleBleClient { public *; }
 -keep class com.bortxapps.simplebleclient.api.contracts.SimpleBleClient$DefaultImpls { *; }

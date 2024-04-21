@@ -34,7 +34,7 @@ internal abstract class BleManagerGattOperationBase(
         try {
             return operation()
         } catch (e: CancellationException) {
-            handleException(e, BleError.COMMUNICATION_FAILED)
+            handleException(e, BleError.INTERNAL_ERROR_COMMUNICATION_CANCELLED_DUE_COROUTINE)
         } catch (e: UninitializedPropertyAccessException) {
             handleException(e, BleError.INTERNAL_ERROR)
         } catch (e: SimpleBleClientException) {
