@@ -54,4 +54,5 @@ jobs:
           files: |
             simpleBleClient/build/outputs/aar/*
             simpleBleClient/build/libs/*
+            simpleBleClient/build/outputs/mapping/release/mapping.txt
             LICENSE
