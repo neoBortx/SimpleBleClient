@@ -35,8 +35,11 @@ internal class BleManagerGattWriteOperations(
                 it
             )
         } ?: run {
-            Log.e("BleManager", "writeCharacteristic characteristic is null")
-            throw SimpleBleClientException(BleError.SEND_COMMAND_FAILED_NO_CHARACTERISTIC_FOUND_TO_SEND, "Characteristic is null")
+            Log.e("BleManager", "writeCharacteristic characteristic $characteristicUUID is not found in service $serviceUUID")
+            throw SimpleBleClientException(
+                BleError.SEND_COMMAND_FAILED_NO_CHARACTERISTIC_FOUND_TO_SEND,
+                "characteristic $characteristicUUID is not found in service $serviceUUID"
+            )
         }
     }
 
@@ -53,8 +56,11 @@ internal class BleManagerGattWriteOperations(
                 it
             )
         } ?: run {
-            Log.e("BleManager", "writeCharacteristic characteristic is null")
-            throw SimpleBleClientException(BleError.SEND_COMMAND_FAILED_NO_CHARACTERISTIC_FOUND_TO_SEND, "Characteristic is null")
+            Log.e("BleManager", "writeCharacteristic characteristic $characteristicUUID is not found in service $serviceUUID")
+            throw SimpleBleClientException(
+                BleError.SEND_COMMAND_FAILED_NO_CHARACTERISTIC_FOUND_TO_SEND,
+                "writeCharacteristic characteristic $characteristicUUID is not found in service $serviceUUID"
+            )
         }
     }
 

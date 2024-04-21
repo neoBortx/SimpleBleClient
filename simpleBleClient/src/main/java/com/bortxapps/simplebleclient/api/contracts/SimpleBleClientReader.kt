@@ -1,5 +1,6 @@
 package com.bortxapps.simplebleclient.api.contracts
 
+import com.bortxapps.simplebleclient.api.data.BleCharacteristic
 import com.bortxapps.simplebleclient.api.data.BleNetworkMessage
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
 import java.util.UUID
@@ -34,4 +35,25 @@ public interface SimpleBleClientReader {
      */
 
     public suspend fun readData(serviceUUID: UUID, characteristicUUID: UUID): BleNetworkMessage
+
+    /**
+     * Reads all characteristics from the BLE device.
+     *
+     * This function is a suspend function, designed for use with Kotlin coroutines,
+     * allowing for asynchronous reading of all characteristics from a BLE device.
+     *
+     * @return A list of [BleCharacteristic] objects representing all the characteristics of the BLE device.
+     *
+     * @throws SimpleBleClientException Thrown when an error occurs during the BLE operation.
+     *
+     * Usage example:
+     *  val simpleBleClient = SimpleBleClientBuilder..build(context)
+     *
+     *  viewModelScope.launch {
+     *      withContext(IO) {
+     *          val result = simpleBleClient.getAllCharacteristics()
+     *     }
+     *  }
+     */
+    public suspend fun getAllCharacteristics(): List<BleCharacteristic>
 }

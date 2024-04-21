@@ -2,6 +2,7 @@ package com.bortxapps.simplebleclient.manager
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
+import com.bortxapps.simplebleclient.api.data.BleCharacteristic
 import com.bortxapps.simplebleclient.api.data.BleNetworkMessage
 import com.bortxapps.simplebleclient.exceptions.BleError
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
@@ -40,6 +41,19 @@ internal class BleManagerGattReadOperations(
         }
 
         return resultRead ?: throw SimpleBleClientException(BleError.SEND_COMMAND_FAILED_NO_DATA_RECEIVED_IN_RESPONSE, "No data received from device")
+    }
+
+    suspend fun getAllCharacteristics(bluetoothGatt: BluetoothGatt): List<BleCharacteristic> {
+        val resultRead: MutableList<BleCharacteristic> = mutableListOf()
+        launchGattOperation {
+            bluetoothGatt.services?.forEach { service ->
+                service.characteristics?.forEach { characteristic ->
+                    resultRead.add(BleCharacteristic(service.uuid, characteristic.uuid))
+                }
+            }
+        }
+
+        return resultRead
     }
     //endregion
 }

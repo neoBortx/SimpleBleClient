@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattService
 import com.bortxapps.simplebleclient.api.data.BleNetworkMessage
 import com.bortxapps.simplebleclient.exceptions.SimpleBleClientException
 import com.bortxapps.simplebleclient.manager.utils.BleNetworkMessageProcessorDefaultImpl
@@ -157,6 +158,46 @@ internal class BleManagerGattReadOperationsTest {
                 bleManagerGattReadOperations.readData(serviceUUID, characteristicUUID, bluetoothGattMock)
             }
         }
+    }
+
+    @Test
+    fun testGetAllCharacteristics() = runTest {
+        val serviceUUID = UUID.randomUUID()
+        val characteristicUUID = UUID.randomUUID()
+        val service = mockk<BluetoothGattService>(relaxed = true)
+        val characteristic = mockk<BluetoothGattCharacteristic>(relaxed = true)
+        val characteristics = listOf(characteristic)
+        val services = listOf(service)
+        every { service.uuid } returns serviceUUID
+        every { characteristic.uuid } returns characteristicUUID
+        every { service.characteristics } returns characteristics
+        every { bluetoothGattMock.services } returns services
+
+        val result = bleManagerGattReadOperations.getAllCharacteristics(bluetoothGattMock)
+        assertEquals(1, result.size)
+        assertEquals(serviceUUID, result[0].serviceUUID)
+        assertEquals(characteristicUUID, result[0].characteristicUUID)
+    }
+
+    @Test
+    fun testGetAllCharacteristics_noServices_expectEmptyList() = runTest {
+        every { bluetoothGattMock.services } returns null
+
+        val result = bleManagerGattReadOperations.getAllCharacteristics(bluetoothGattMock)
+        assertEquals(0, result.size)
+    }
+
+    @Test
+    fun testGetAllCharacteristics_noCharacteristics_expectEmptyList() = runTest {
+        val serviceUUID = UUID.randomUUID()
+        val service = mockk<BluetoothGattService>(relaxed = true)
+        val services = mutableListOf(service)
+        every { service.uuid } returns serviceUUID
+        every { service.characteristics } returns null
+        every { bluetoothGattMock.services } returns services
+
+        val result = bleManagerGattReadOperations.getAllCharacteristics(bluetoothGattMock)
+        assertEquals(0, result.size)
     }
     //endregion
 }

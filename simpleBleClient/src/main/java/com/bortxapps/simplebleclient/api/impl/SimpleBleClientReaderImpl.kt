@@ -2,6 +2,7 @@ package com.bortxapps.simplebleclient.api.impl
 
 import android.content.Context
 import com.bortxapps.simplebleclient.api.contracts.SimpleBleClientReader
+import com.bortxapps.simplebleclient.api.data.BleCharacteristic
 import com.bortxapps.simplebleclient.api.data.BleNetworkMessage
 import com.bortxapps.simplebleclient.manager.BleManagerGattReadOperations
 import com.bortxapps.simplebleclient.manager.utils.launchBleOperationWithValidations
@@ -23,5 +24,11 @@ internal class SimpleBleClientReaderImpl(
             characteristicUUID,
             gattHolder.getGatt()!!
         )
+    }
+
+    override suspend fun getAllCharacteristics():
+            List<BleCharacteristic> = launchBleOperationWithValidations(context) {
+        gattHolder.checkGatt()
+        bleManagerGattReadOperations.getAllCharacteristics(gattHolder.getGatt()!!)
     }
 }

@@ -50,6 +50,7 @@
 -keep class com.bortxapps.simplebleclient.api.contracts.SimpleBleClientSubscription$DefaultImpls { *; }
 -keep public class com.bortxapps.simplebleclient.api.data.BleConnectionStatus { public *; }
 -keep public class com.bortxapps.simplebleclient.api.data.BleNetworkMessage { public *; }
+-keep public class com.bortxapps.simplebleclient.api.data.BleCharacteristic { public *; }
 -keep public class com.bortxapps.simplebleclient.api.SimpleBleClientBuilder { public *; }
 -keep public class com.bortxapps.simplebleclient.exceptions.BleError { public *; }
 -keep public class com.bortxapps.simplebleclient.exceptions.SimpleBleClientException { public *; }

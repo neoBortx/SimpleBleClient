@@ -123,6 +123,28 @@ internal class SimpleBleClientReaderImplTest {
             simpleBleClientReaderImpl.readData(serviceUUID, characteristicUUID)
         }
     }
+
+    @Test
+    fun `readAllCharacteristics gatt not initialized expect exception`() = runTest {
+        Assert.assertThrows(SimpleBleClientException::class.java) {
+            runBlocking {
+                simpleBleClientReaderImpl.getAllCharacteristics()
+            }
+        }
+    }
+
+    @Test
+    fun `readAllCharacteristics gatt initialized expect read data invoked`() = runTest {
+        gatHolder.setGatt(bluetoothGattMock)
+
+        coEvery {
+            bleManagerGattReadOperationsMock.getAllCharacteristics(bluetoothGattMock)
+        } returns listOf()
+
+        runBlocking {
+            simpleBleClientReaderImpl.getAllCharacteristics()
+        }
+    }
     //endregion
 
     private fun mockValidationsAllOk() {
